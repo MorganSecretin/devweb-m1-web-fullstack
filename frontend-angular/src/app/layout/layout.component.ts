@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
+import { TokenService } from '../auth/services/token.service';
 
 @Component({
     selector: 'app-layout',
@@ -10,14 +11,18 @@ import { MenubarModule } from 'primeng/menubar';
     template: `
         <header class="flex items-center justify-between px-6 py-4 bg-gray-100 shadow">
             <nav class="flex gap-8">
-                <a routerLink="/register" class="text-gray-700 hover:text-blue-600 font-semibold">Register</a>
-                <a routerLink="/test2" class="text-gray-700 hover:text-blue-600 font-semibold">Test 2</a>
-                <a routerLink="/test3" class="text-gray-700 hover:text-blue-600 font-semibold">Test 3</a>
+                <a routerLink="/dashboard" class="text-gray-700 hover:text-blue-600 font-semibold">Accueil</a>
+                <a routerLink="/employees" class="text-gray-700 hover:text-blue-600 font-semibold">Employés</a>
+                <a routerLink="/applicants" class="text-gray-700 hover:text-blue-600 font-semibold">Candidats</a>
             </nav>
             <div class="flex gap-2">
-                <button pButton type="button" label="Register" class="p-button-outlined"></button>
-                <button pButton type="button" label="Login" class="p-button-outlined"></button>
-                <button pButton type="button" label="Logout" class="p-button-danger"></button>
+                @if (!isAuthenticated) { 
+                    <button pButton type="button" label="Register" class="p-button-outlined" (click)="redirectTo('/register')"></button>
+                    <button pButton type="button" label="Login" class="p-button-outlined" (click)="redirectTo('/login')"></button>
+                }
+                @else {
+                    <button pButton type="button" label="Logout" class="p-button-danger" (click)="logout()"></button>
+                }
             </div>
         </header>
         <main class="flex-1 p-6">
@@ -28,4 +33,22 @@ import { MenubarModule } from 'primeng/menubar';
         </footer>
     `
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+    constructor(
+        private readonly router: Router,
+        private readonly authService: TokenService,
+    ) {}
+
+    get isAuthenticated(): boolean {
+        return this.authService.isAuthenticated();
+    }
+
+    redirectTo(path: string): void {
+        this.router.navigate([path]);
+    }
+
+    logout(): void {
+        this.authService.removeToken();
+        this.redirectTo('/login');
+    }
+}

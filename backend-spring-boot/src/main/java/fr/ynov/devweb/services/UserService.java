@@ -2,8 +2,6 @@ package fr.ynov.devweb.services;
 
 import fr.ynov.devweb.configs.jwts.JwtTokenProvider;
 import fr.ynov.devweb.entities.User;
-import fr.ynov.devweb.exceptions.EntityNotFoundException;
-import fr.ynov.devweb.exceptions.InvalidEmailException;
 import fr.ynov.devweb.repositories.UserRepository;
 
 import java.util.List;
@@ -11,6 +9,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -44,14 +44,14 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé : " + username));
     }
 
 
 
     public boolean verifiyUser(String email, String password) {
         return userRepository.findByEmail(email).map(user -> passwordEncoder.matches(password, user.getPassword())).orElseThrow(
-                () -> new UsernameNotFoundException("User not found" + email)
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé : " + email)
         );
     }
 
@@ -61,14 +61,19 @@ public class UserService implements UserDetailsService {
 
 
     public boolean createUser(User user) {
-     user.setPassword(passwordEncoder.encode(user.getPassword()));
-     userRepository.save(user);
-     return true;
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists : " + user.getEmail());
+        }
+        System.out.println("---> Creating user: " + user.getEmail());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        System.out.println("---> User created successfully: " + user.getEmail());
+        return true;
     }
 
     public User saveUser(User user) {
         if (!user.getEmail().contains("@")) {
-            throw new InvalidEmailException("Invalid format email");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email format: " + user.getEmail());
         }
         return userRepository.save(user);
     }
@@ -92,7 +97,7 @@ public class UserService implements UserDetailsService {
         if(userRepository.findById(id).isPresent()){
             userRepository.deleteById(id);
         }else{
-            throw new EntityNotFoundException("User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
         }
     }
 
@@ -101,7 +106,7 @@ public class UserService implements UserDetailsService {
             user.setId(id);
             return userRepository.save(user);
         }else {
-            throw new EntityNotFoundException("User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
         }
     }
 }

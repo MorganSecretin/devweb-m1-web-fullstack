@@ -1,16 +1,18 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
-import { RegisterComponent } from './auth/register/register.component';
+import { RegisterComponent } from './auth/components/register/register.component';
+import { LoginComponent } from './auth/components/login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const appRoutes: Routes = [
+    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     {
         path: '',
         component: LayoutComponent,
         children: [
+            { path: 'dashboard', component: DashboardComponent },
             { path: 'register', component: RegisterComponent },
-            // { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
-            // { path: 'documentation', component: Documentation },
-            // { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
+            { path: 'login', component: LoginComponent },
         ]
     },
     // { path: 'landing', component: Landing },
