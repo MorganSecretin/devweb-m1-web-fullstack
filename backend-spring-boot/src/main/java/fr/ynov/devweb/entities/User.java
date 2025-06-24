@@ -3,6 +3,7 @@ package fr.ynov.devweb.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,46 +16,29 @@ import java.util.Collection;
 @Table(name = "users")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     @Column(nullable = false)
     private String password;
+
     @Column(unique = true, nullable = false)
     private String email;
+
     private String roles;
-    private boolean isEnabled=true;
+
+    private boolean isEnabled = true;
 
     public User(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
-    }
-
-    public String getRoles() {
-        return roles;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public User() {
     }
 
     @Override
@@ -63,11 +47,6 @@ public class User implements UserDetails {
                 .stream(roles.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .toList();
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
     }
 
     @Override
@@ -94,6 +73,4 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return isEnabled;
     }
-
-
 }
