@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
-import fr.ynov.devweb.dtos.PersonDto;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

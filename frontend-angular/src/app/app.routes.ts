@@ -3,6 +3,7 @@ import { LayoutComponent } from './layout/layout.component';
 import { RegisterComponent } from './auth/components/register/register.component';
 import { LoginComponent } from './auth/components/login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { EmployeeComponent } from '@app/employees/components/employee.component';
 
 export const appRoutes: Routes = [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -13,6 +14,7 @@ export const appRoutes: Routes = [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'register', component: RegisterComponent },
             { path: 'login', component: LoginComponent },
+            { path: 'employees', component: EmployeeComponent },
         ]
     },
     // { path: 'landing', component: Landing },

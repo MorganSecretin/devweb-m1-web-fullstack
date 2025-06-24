@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { TokenService } from '@app/auth/services/token.service';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
-import { TokenService } from '../auth/services/token.service';
 
 @Component({
     selector: 'app-layout',

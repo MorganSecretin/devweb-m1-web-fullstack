@@ -9,6 +9,8 @@ export class AuthInterceptor implements HttpInterceptor {
     constructor(private readonly authService: TokenService) {}
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        console.log('AuthInterceptor: intercepting request', req.url);
+        console.log('AuthInterceptor: isAuthenticated', this.authService.isAuthenticated());
         if (!this.authService.isAuthenticated()) {
             // Si l'utilisateur n'est pas authentifié, ne pas ajouter de token et on gère plus tard
             return next.handle(req);

@@ -30,7 +30,7 @@ export class UserService {
     login(dto: UserLoginDto, resultHandler?: ResultHandler<string> ): void {
         this.http.post(`${this.apiUrl}/login`, dto, { responseType: 'text' }).subscribe({
             next: (data) => {
-                console.log('User registered successfully:', data);
+                console.log('User log successfully:', data);
                 if (!data) {
                     resultHandler?.error?.(new Error('Registration failed, no token received.') as any);
                     return;
