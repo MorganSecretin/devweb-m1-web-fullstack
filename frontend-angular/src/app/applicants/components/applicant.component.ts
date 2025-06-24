@@ -1,38 +1,38 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Employee } from '@app/employees/models/employee.model';
-import { EmployeeService } from '@app/employees/services/employee.service';
+import { Applicant } from '@app/applicants/models/applicant.model';
+import { ApplicantService } from '@app/applicants/services/applicants.service';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 
 @Component({
-    selector: 'app-employee',
+    selector: 'app-applicant',
     standalone: true,
     template: `
         <div class="flex gap-4 items-center">
-            <h2>Employés</h2>
+            <h2>Candidats</h2>
             <p-button severity="primary" (click)="startCreate()">Ajouter</p-button>
         </div>
-        <p-table [value]="employees" [tableStyle]="{ 'min-width': '50rem' }">
+        <p-table [value]="applicants" [tableStyle]="{ 'min-width': '50rem' }">
             <ng-template pTemplate="header">
                 <tr>
                     <th>Nom</th>
-                    <th>Occupation</th>
+                    <th>Domaine</th>
                     <th>Email</th>
                     <th>Téléphone</th>
                     <th>Action</th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-employee>
+            <ng-template pTemplate="body" let-applicant>
                 <tr>
-                    <td>{{ employee.person.name }}</td>
-                    <td>{{ employee.job }}</td>
-                    <td>{{ employee.person.email }}</td>
-                    <td>{{ employee.person.phone }}</td>
+                    <td>{{ applicant.person.name }}</td>
+                    <td>{{ applicant.domain }}</td>
+                    <td>{{ applicant.person.email }}</td>
+                    <td>{{ applicant.person.phone }}</td>
                     <td class="flex gap-2">
-                        <p-button severity="success" (click)="view(employee)">Voir</p-button>
-                        <p-button severity="info" (click)="update(employee)">Mettre à jour</p-button>
-                        <p-button severity="danger" (click)="delete(employee)">Supprimer</p-button>
+                        <p-button severity="success" (click)="view(applicant)">Voir</p-button>
+                        <p-button severity="info" (click)="update(applicant)">Mettre à jour</p-button>
+                        <p-button severity="danger" (click)="delete(applicant)">Supprimer</p-button>
                     </td>
                 </tr>
             </ng-template>
@@ -40,23 +40,23 @@ import { TableModule } from 'primeng/table';
     `,
     imports: [CommonModule, TableModule, ButtonModule],
 })
-export class EmployeeComponent {
-    protected readonly employees: Employee[] = [];
+export class ApplicantComponent {
+    protected readonly applicants: Applicant[] = [];
 
-    constructor(private readonly employeeService: EmployeeService) {}
+    constructor(private readonly applicantService: ApplicantService) {}
 
     ngOnInit() {
         this.load();
     }
 
     load() {
-        this.employeeService.getAll({
+        this.applicantService.getAll({
             next: (data) => {
-                this.employees.push(...data);
-                console.log('Employees loaded:', this.employees.length);
+                this.applicants.push(...data);
+                console.log('Applicants loaded:', this.applicants.length);
             },
             error: (error) => {
-                console.error('Error loading employees:', error);
+                console.error('Error loading applicants:', error);
             }
         });
     }
@@ -66,21 +66,21 @@ export class EmployeeComponent {
         console.log('Démarrer la création d\'un nouvel employé');
     }
 
-    view(employee: Employee) {
+    view(applicant: Applicant) {
         // Implémenter la logique pour voir les détails de l'employé
-        console.log('Voir', employee);
+        console.log('Voir', applicant);
     }
 
-    update(employee: Employee) {
+    update(applicant: Applicant) {
         // Implémenter la logique pour mettre à jour l'employé
-        console.log('Mettre à jour', employee);
+        console.log('Mettre à jour', applicant);
     }
 
-    delete(employee: Employee) {
+    delete(applicant: Applicant) {
         // Implémenter la logique pour supprimer l'employé
-        this.employeeService.delete(employee.id, {
+        this.applicantService.delete(applicant.id, {
             next: () => {
-                this.load(); // Recharger la liste après la suppression
+                this.load(); // Recharger la liste après suppression
             },
             error: (error) => {
                 console.error('Erreur lors de la suppression de l\'employé:', error);

@@ -12,8 +12,10 @@ import { MenubarModule } from 'primeng/menubar';
         <header class="flex items-center justify-between px-6 py-4 bg-gray-100 shadow">
             <nav class="flex gap-8">
                 <a routerLink="/dashboard" class="text-gray-700 hover:text-blue-600 font-semibold">Accueil</a>
-                <a routerLink="/employees" class="text-gray-700 hover:text-blue-600 font-semibold">Employés</a>
-                <a routerLink="/applicants" class="text-gray-700 hover:text-blue-600 font-semibold">Candidats</a>
+                @if (isAuthenticated) {
+                    <a routerLink="/employees" class="text-gray-700 hover:text-blue-600 font-semibold">Employés</a>
+                    <a routerLink="/applicants" class="text-gray-700 hover:text-blue-600 font-semibold">Candidats</a>
+                }
             </nav>
             <div class="flex gap-2">
                 @if (!isAuthenticated) { 

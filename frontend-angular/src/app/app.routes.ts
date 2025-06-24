@@ -4,6 +4,7 @@ import { RegisterComponent } from './auth/components/register/register.component
 import { LoginComponent } from './auth/components/login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { EmployeeComponent } from '@app/employees/components/employee.component';
+import { ApplicantComponent } from '@app/applicants/components/applicant.component';
 
 export const appRoutes: Routes = [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -15,6 +16,7 @@ export const appRoutes: Routes = [
             { path: 'register', component: RegisterComponent },
             { path: 'login', component: LoginComponent },
             { path: 'employees', component: EmployeeComponent },
+            { path: 'applicants', component: ApplicantComponent },
         ]
     },
     // { path: 'landing', component: Landing },

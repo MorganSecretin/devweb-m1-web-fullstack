@@ -30,16 +30,16 @@ import { Router } from '@angular/router';
                     </div>
 
                     <div class="flex flex-col gap-1">
+                        <label for="roles" class="text-sm font-medium">Rôle</label>
+                        <p-select id="roles" formControlName="roles" [options]="roles" optionLabel="label" optionValue="value" placeholder="Sélectionner un rôle" class="w-full" appendTo="body"></p-select>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
                         <label for="password" class="text-sm font-medium">Mot de passe</label>
                         <input id="password" type="password" pPassword formControlName="password" class="w-full" appendTo="body" />
                     </div>
 
-                    <div class="flex flex-col gap-1">
-                        <label for="roles" class="text-sm font-medium">Rôle</label>
-                        <p-select id="roles" formControlName="roles" [options]="roles" optionLabel="label" optionValue="value" placeholder="Sélectionner un rôle" class="w-full"></p-select>
-                    </div>
-
-                    <div class="pt-4">
+                    <div class="pt-16">
                         <button pButton type="submit" label="S'inscrire" class="w-full" [disabled]="registerForm.invalid" (load)="submitted"></button>
                     </div>
                 </form>

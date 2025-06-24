@@ -18,6 +18,12 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> getEmployeeCount() {
+        long count = employeeService.getAllEmployees().size();
+        return new ResponseEntity<>(count, HttpStatus.OK);
+    }
+
     // Créer un nouvel employé
     @PostMapping
     public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto) {

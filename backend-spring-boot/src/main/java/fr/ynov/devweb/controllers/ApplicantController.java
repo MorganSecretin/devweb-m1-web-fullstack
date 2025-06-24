@@ -18,6 +18,12 @@ public class ApplicantController {
     @Autowired
     private ApplicantService applicantService;
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> getApplicantCount() {
+        long count = applicantService.getAllApplicants().size();
+        return new ResponseEntity<>(count, HttpStatus.OK);
+    }
+
     // Créer un nouveau candidat
     @PostMapping
     public ResponseEntity<ApplicantDto> createApplicant(@RequestBody ApplicantDto applicantDto) {

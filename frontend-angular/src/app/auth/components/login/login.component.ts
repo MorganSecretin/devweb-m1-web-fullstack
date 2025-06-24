@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, InputTextModule, PasswordModule, ButtonModule, CardModule],
     template: `
-        <div class="max-w-md mx-auto mt-10">
+        <div class="max-w-md mx-auto mt-10" style="z-index: 1017; position: relative;">
             <p-card header="Connexion" class="rounded-2xl p-6">
                 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
                     <div class="flex flex-col gap-1">
@@ -25,7 +25,7 @@ import { Router } from '@angular/router';
                         <label for="password" class="text-sm font-medium">Mot de passe</label>
                         <input id="password" type="password" pPassword formControlName="password" class="w-full" appendTo="body" />
                     </div>
-                    <div class="pt-4">
+                    <div class="pt-16">
                         <button pButton type="submit" label="Se connecter" class="w-full" [disabled]="loginForm.invalid" (load)="submitted"></button>
                     </div>
                 </form>
