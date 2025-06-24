@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { Employee } from '@app/employees/models/employee.model';
 import { EmployeeService } from '@app/employees/services/employee.service';
 import { ButtonModule } from 'primeng/button';
@@ -43,7 +44,10 @@ import { TableModule } from 'primeng/table';
 export class EmployeeComponent {
     protected readonly employees: Employee[] = [];
 
-    constructor(private readonly employeeService: EmployeeService) {}
+    constructor(
+        private readonly employeeService: EmployeeService,
+        private readonly router: Router
+    ) {}
 
     ngOnInit() {
         this.load();
@@ -59,32 +63,33 @@ export class EmployeeComponent {
                 console.error('Error loading employees:', error);
             }
         });
-    }
-
-    startCreate() {
-        // Implémenter la logique pour démarrer la création d'un nouvel employé
-        console.log('Démarrer la création d\'un nouvel employé');
+    }    startCreate() {
+        // Navigation vers la page de création d'un nouvel employé
+        this.router.navigate(['/employees/new']);
     }
 
     view(employee: Employee) {
-        // Implémenter la logique pour voir les détails de l'employé
-        console.log('Voir', employee);
+        // Navigation vers la page de détails de l'employé
+        this.router.navigate(['/employees/view', employee.person.id]);
     }
 
     update(employee: Employee) {
-        // Implémenter la logique pour mettre à jour l'employé
-        console.log('Mettre à jour', employee);
+        // Navigation vers la page de modification de l'employé
+        this.router.navigate(['/employees/edit', employee.person.id]);
     }
 
     delete(employee: Employee) {
-        // Implémenter la logique pour supprimer l'employé
-        this.employeeService.delete(employee.id, {
-            next: () => {
-                this.load(); // Recharger la liste après la suppression
-            },
-            error: (error) => {
-                console.error('Erreur lors de la suppression de l\'employé:', error);
-            }
-        });
+        // Confirmer avant suppression
+        if (confirm(`Êtes-vous sûr de vouloir supprimer l'employé ${employee.person.name} ?`)) {
+            this.employeeService.delete(employee.person.id, {
+                next: () => {
+                    // Vider le tableau et recharger
+                    this.load();
+                },
+                error: (error) => {
+                    console.error('Erreur lors de la suppression de l\'employé:', error);
+                }
+            });
+        }
     }
 }

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { Applicant } from '@app/applicants/models/applicant.model';
 import { ApplicantService } from '@app/applicants/services/applicants.service';
 import { ButtonModule } from 'primeng/button';
@@ -43,7 +44,10 @@ import { TableModule } from 'primeng/table';
 export class ApplicantComponent {
     protected readonly applicants: Applicant[] = [];
 
-    constructor(private readonly applicantService: ApplicantService) {}
+    constructor(
+        private readonly applicantService: ApplicantService,
+        private readonly router: Router
+    ) {}
 
     ngOnInit() {
         this.load();
@@ -59,32 +63,33 @@ export class ApplicantComponent {
                 console.error('Error loading applicants:', error);
             }
         });
-    }
-
-    startCreate() {
-        // Implémenter la logique pour démarrer la création d'un nouvel employé
-        console.log('Démarrer la création d\'un nouvel employé');
+    }    startCreate() {
+        // Navigation vers la page de création d'un nouveau candidat
+        this.router.navigate(['/applicants/new']);
     }
 
     view(applicant: Applicant) {
-        // Implémenter la logique pour voir les détails de l'employé
-        console.log('Voir', applicant);
+        // Navigation vers la page de détails du candidat
+        this.router.navigate(['/applicants/view', applicant.person.id]);
     }
 
     update(applicant: Applicant) {
-        // Implémenter la logique pour mettre à jour l'employé
-        console.log('Mettre à jour', applicant);
+        // Navigation vers la page de modification du candidat
+        this.router.navigate(['/applicants/edit', applicant.person.id]);
     }
 
     delete(applicant: Applicant) {
-        // Implémenter la logique pour supprimer l'employé
-        this.applicantService.delete(applicant.id, {
-            next: () => {
-                this.load(); // Recharger la liste après suppression
-            },
-            error: (error) => {
-                console.error('Erreur lors de la suppression de l\'employé:', error);
-            }
-        });
+        // Confirmer avant suppression
+        if (confirm(`Êtes-vous sûr de vouloir supprimer le candidat ${applicant.person.name} ?`)) {
+            this.applicantService.delete(applicant.person.id, {
+                next: () => {
+                    // Vider le tableau et recharger
+                    this.load();
+                },
+                error: (error) => {
+                    console.error('Erreur lors de la suppression du candidat:', error);
+                }
+            });
+        }
     }
 }
