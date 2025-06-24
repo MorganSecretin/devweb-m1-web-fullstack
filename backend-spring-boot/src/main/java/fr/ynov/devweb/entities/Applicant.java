@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 
 @Entity
@@ -17,9 +17,11 @@ import java.sql.Date;
 @NoArgsConstructor
 public class Applicant {
     @Id
+    @Column(length = 4, unique = true, nullable = false)
+    private String id; // Same as Person ID
+    
     @OneToOne
-    @MapsId
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     private Person person;
 
     @Min(0)
@@ -31,7 +33,7 @@ public class Applicant {
     private String domain;
 
     @Column()
-    private Date interviewDate;
+    private LocalDate interviewDate;
 
     @Column()
     private String comment;
