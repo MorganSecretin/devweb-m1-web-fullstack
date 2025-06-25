@@ -1,10 +1,13 @@
 import { Absence } from "@app/employees/models/abscence.model";
 import { Vacation } from "@app/employees/models/vacation.model";
-import { Person } from "@app/shared/models/person.model";
 
 export interface Employee {
-    id: string; // Same as Person ID
-    person: Person;
+    id: string; // Required
+    name?: string;
+    birth?: string; // ISO date string (e.g., '2023-12-31')
+    address?: string;
+    email: string; // Required
+    phone?: string; // 0644043030 format
     job?: string;
     salary?: number;
     contractStart?: string; // ISO date string (e.g., '2024-06-01')

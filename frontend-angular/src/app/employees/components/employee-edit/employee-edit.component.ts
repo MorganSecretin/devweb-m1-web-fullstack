@@ -47,27 +47,19 @@ import { EmployeeService } from '@app/employees/services/employee.service';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
                 <input 
                   type="text" 
                   formControlName="name"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="employeeForm.get('name')?.errors?.['required'] && employeeForm.get('name')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  Le nom est requis
-                </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance</label>
                 <input 
                   type="date" 
                   formControlName="birth"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="employeeForm.get('birth')?.errors?.['required'] && employeeForm.get('birth')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  La date de naissance est requise
-                </div>
               </div>
 
               <div>
@@ -87,27 +79,19 @@ import { EmployeeService } from '@app/employees/services/employee.service';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
                 <input 
                   type="tel" 
                   formControlName="phone"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="employeeForm.get('phone')?.errors?.['required'] && employeeForm.get('phone')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  Le téléphone est requis
-                </div>
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Adresse *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
                 <textarea 
                   formControlName="address"
                   rows="3"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                <div *ngIf="employeeForm.get('address')?.errors?.['required'] && employeeForm.get('address')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  L'adresse est requise
-                </div>
               </div>
             </div>
           </div>
@@ -117,29 +101,21 @@ import { EmployeeService } from '@app/employees/services/employee.service';
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Informations Professionnelles</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Poste *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Poste</label>
                 <input 
                   type="text" 
                   formControlName="job"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="employeeForm.get('job')?.errors?.['required'] && employeeForm.get('job')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  Le poste est requis
-                </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Salaire *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Salaire</label>
                 <input 
                   type="number" 
                   formControlName="salary"
                   min="0"
                   step="0.01"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="employeeForm.get('salary')?.errors?.['required'] && employeeForm.get('salary')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  Le salaire est requis
-                </div>
                 <div *ngIf="employeeForm.get('salary')?.errors?.['min'] && employeeForm.get('salary')?.touched" 
                      class="text-red-500 text-sm mt-1">
                   Le salaire doit être positif
@@ -147,15 +123,11 @@ import { EmployeeService } from '@app/employees/services/employee.service';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Début de contrat *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Début de contrat</label>
                 <input 
                   type="date" 
                   formControlName="contractStart"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="employeeForm.get('contractStart')?.errors?.['required'] && employeeForm.get('contractStart')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  La date de début de contrat est requise
-                </div>
               </div>
 
               <div>
@@ -224,14 +196,14 @@ export class EmployeeEditComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       id: ['', Validators.required],
-      name: ['', Validators.required],
-      birth: ['', Validators.required],
-      address: ['', Validators.required],
+      name: [''],
+      birth: [''],
+      address: [''],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      job: ['', Validators.required],
-      salary: ['', [Validators.required, Validators.min(0)]],
-      contractStart: ['', Validators.required],
+      phone: [''],
+      job: [''],
+      salary: ['', [Validators.min(0)]],
+      contractStart: [''],
       contractEnd: [''],
       comment: ['']
     });
@@ -242,14 +214,14 @@ export class EmployeeEditComponent implements OnInit {
 
     this.employeeService.getById(id, {
       next: (employee) => {
-        if (employee && employee.person) {
+        if (employee) {
           this.employeeForm.patchValue({
-            id: employee.person.id, // ID obligatoire
-            name: employee.person.name || '',
-            birth: employee.person.birth || '',
-            address: employee.person.address || '',
-            email: employee.person.email, // Email obligatoire
-            phone: employee.person.phone || '',
+            id: employee.id, // ID obligatoire
+            name: employee.name || '',
+            birth: employee.birth || '',
+            address: employee.address || '',
+            email: employee.email, // Email obligatoire
+            phone: employee.phone || '',
             job: employee.job || '',
             salary: employee.salary ?? '',
             contractStart: employee.contractStart || '',
@@ -278,14 +250,11 @@ export class EmployeeEditComponent implements OnInit {
       const formData = this.employeeForm.value;
       const employee: Employee = {
         id: formData.id, // ID obligatoire
-        person: {
-          id: formData.id, // ID obligatoire
-          name: formData.name && formData.name !== '-' ? formData.name : undefined,
-          birth: formData.birth && formData.birth !== '-' ? formData.birth : undefined,
-          address: formData.address && formData.address !== '-' ? formData.address : undefined,
-          email: formData.email, // Email obligatoire
-          phone: formData.phone && formData.phone !== '-' ? formData.phone : undefined
-        },
+        name: formData.name && formData.name !== '-' ? formData.name : undefined,
+        birth: formData.birth && formData.birth !== '-' ? formData.birth : undefined,
+        address: formData.address && formData.address !== '-' ? formData.address : undefined,
+        email: formData.email, // Email obligatoire
+        phone: formData.phone && formData.phone !== '-' ? formData.phone : undefined,
         job: formData.job && formData.job !== '-' ? formData.job : undefined,
         salary: formData.salary && formData.salary !== '-' && formData.salary !== '' ? Number(formData.salary) : undefined,
         contractStart: formData.contractStart && formData.contractStart !== '-' ? formData.contractStart : undefined,

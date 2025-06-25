@@ -26,10 +26,10 @@ import { TableModule } from 'primeng/table';
             </ng-template>
             <ng-template pTemplate="body" let-employee>
                 <tr>
-                    <td>{{ employee.person?.name || '' }}</td>
+                    <td>{{ employee.name || '' }}</td>
                     <td>{{ employee.job || '' }}</td>
-                    <td>{{ employee.person?.email || '' }}</td>
-                    <td>{{ employee.person?.phone || '' }}</td>
+                    <td>{{ employee.email || '' }}</td>
+                    <td>{{ employee.phone || '' }}</td>
                     <td class="flex gap-2">
                         <p-button severity="success" (click)="view(employee)">Voir</p-button>
                         <p-button severity="info" (click)="update(employee)">Mettre à jour</p-button>
@@ -73,24 +73,24 @@ export class EmployeeComponent {
 
     view(employee: Employee) {
         // Navigation vers la page de détails de l'employé
-        if (employee && employee.person && employee.person.id) {
-            this.router.navigate(['/employees/view', employee.person.id]);
+        if (employee && employee.id) {
+            this.router.navigate(['/employees/view', employee.id]);
         }
     }
 
     update(employee: Employee) {
         // Navigation vers la page de modification de l'employé
-        if (employee && employee.person && employee.person.id) {
-            this.router.navigate(['/employees/edit', employee.person.id]);
+        if (employee && employee.id) {
+            this.router.navigate(['/employees/edit', employee.id]);
         }
     }
 
     delete(employee: Employee) {
         // Confirmer avant suppression
-        if (employee && employee.person && employee.person.id) {
-            const name = employee.person.name || 'cet employé';
+        if (employee && employee.id) {
+            const name = employee.name || 'cet employé';
             if (confirm(`Êtes-vous sûr de vouloir supprimer ${name} ?`)) {
-                this.employeeService.delete(employee.person.id, {
+                this.employeeService.delete(employee.id, {
                     next: () => {
                         // Recharger la liste
                         this.load();

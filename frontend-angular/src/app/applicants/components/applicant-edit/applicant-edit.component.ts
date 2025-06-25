@@ -47,27 +47,19 @@ import { ApplicantService } from '@app/applicants/services/applicants.service';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
                 <input 
                   type="text" 
                   formControlName="name"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="applicantForm.get('name')?.errors?.['required'] && applicantForm.get('name')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  Le nom est requis
-                </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance</label>
                 <input 
                   type="date" 
                   formControlName="birth"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="applicantForm.get('birth')?.errors?.['required'] && applicantForm.get('birth')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  La date de naissance est requise
-                </div>
               </div>
 
               <div>
@@ -87,27 +79,19 @@ import { ApplicantService } from '@app/applicants/services/applicants.service';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
                 <input 
                   type="tel" 
                   formControlName="phone"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <div *ngIf="applicantForm.get('phone')?.errors?.['required'] && applicantForm.get('phone')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  Le téléphone est requis
-                </div>
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Adresse *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
                 <textarea 
                   formControlName="address"
                   rows="3"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                <div *ngIf="applicantForm.get('address')?.errors?.['required'] && applicantForm.get('address')?.touched" 
-                     class="text-red-500 text-sm mt-1">
-                  L'adresse est requise
-                </div>
               </div>
             </div>
           </div>
@@ -207,11 +191,11 @@ export class ApplicantEditComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       id: ['', Validators.required],
-      name: ['', Validators.required],
-      birth: ['', Validators.required],
-      address: ['', Validators.required],
+      name: [''],
+      birth: [''],
+      address: [''],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
+      phone: [''],
       note: ['', [Validators.min(0), Validators.max(20)]],
       domain: [''],
       interviewDate: [''],
@@ -224,14 +208,14 @@ export class ApplicantEditComponent implements OnInit {
 
     this.applicantService.getById(id, {
       next: (applicant) => {
-        if (applicant && applicant.person) {
+        if (applicant) {
           this.applicantForm.patchValue({
-            id: applicant.person.id, // ID obligatoire, ne peut pas être null
-            name: applicant.person.name || '',
-            birth: applicant.person.birth || '',
-            address: applicant.person.address || '',
-            email: applicant.person.email, // Email obligatoire, ne peut pas être null
-            phone: applicant.person.phone || '',
+            id: applicant.id, // ID obligatoire, ne peut pas être null
+            name: applicant.name || '',
+            birth: applicant.birth || '',
+            address: applicant.address || '',
+            email: applicant.email, // Email obligatoire, ne peut pas être null
+            phone: applicant.phone || '',
             note: applicant.note ?? '',
             domain: applicant.domain || '',
             interviewDate: applicant.interviewDate || '',
@@ -259,14 +243,11 @@ export class ApplicantEditComponent implements OnInit {
       const formData = this.applicantForm.value;
       const applicant: Applicant = {
         id: formData.id, // ID obligatoire
-        person: {
-          id: formData.id, // ID obligatoire
-          name: formData.name && formData.name !== '-' ? formData.name : undefined,
-          birth: formData.birth && formData.birth !== '-' ? formData.birth : undefined,
-          address: formData.address && formData.address !== '-' ? formData.address : undefined,
-          email: formData.email, // Email obligatoire
-          phone: formData.phone && formData.phone !== '-' ? formData.phone : undefined
-        },
+        name: formData.name && formData.name !== '-' ? formData.name : undefined,
+        birth: formData.birth && formData.birth !== '-' ? formData.birth : undefined,
+        address: formData.address && formData.address !== '-' ? formData.address : undefined,
+        email: formData.email, // Email obligatoire
+        phone: formData.phone && formData.phone !== '-' ? formData.phone : undefined,
         note: formData.note && formData.note !== '-' && formData.note !== '' ? Number(formData.note) : undefined,
         domain: formData.domain && formData.domain !== '-' ? formData.domain : undefined,
         interviewDate: formData.interviewDate && formData.interviewDate !== '-' ? formData.interviewDate : undefined,

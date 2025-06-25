@@ -22,7 +22,12 @@ export class EmployeeService {
     create(employee: Employee, resultHandler?: ResultHandler<Employee>): void {
         // Convertir vers le format DTO attendu par le backend
         const employeeDto = {
-            person: employee.person,
+            id: employee.id,
+            name: employee.name,
+            birth: employee.birth,
+            address: employee.address,
+            email: employee.email,
+            phone: employee.phone,
             job: employee.job,
             salary: employee.salary,
             contractStart: employee.contractStart,
@@ -65,7 +70,12 @@ export class EmployeeService {
     update(id: string, employee: Employee, resultHandler?: ResultHandler<Employee>): void {
         // Convertir vers le format DTO attendu par le backend
         const employeeDto = {
-            person: employee.person,
+            id: employee.id,
+            name: employee.name,
+            birth: employee.birth,
+            address: employee.address,
+            email: employee.email,
+            phone: employee.phone,
             job: employee.job,
             salary: employee.salary,
             contractStart: employee.contractStart,

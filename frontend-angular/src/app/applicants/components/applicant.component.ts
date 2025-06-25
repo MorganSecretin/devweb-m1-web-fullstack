@@ -28,10 +28,10 @@ import { TableModule } from 'primeng/table';
             </ng-template>
             <ng-template pTemplate="body" let-applicant>
                 <tr>
-                    <td>{{ applicant.person?.name || '' }}</td>
+                    <td>{{ applicant.name || '' }}</td>
                     <td>{{ applicant.domain || '' }}</td>
-                    <td>{{ applicant.person?.email || '' }}</td>
-                    <td>{{ applicant.person?.phone || '' }}</td>
+                    <td>{{ applicant.email || '' }}</td>
+                    <td>{{ applicant.phone || '' }}</td>
                     <td class="flex gap-2">
                         <p-button severity="success" (click)="view(applicant)">Voir</p-button>
                         <p-button severity="info" (click)="update(applicant)">Mettre à jour</p-button>
@@ -77,24 +77,24 @@ export class ApplicantComponent {
 
     view(applicant: Applicant) {
         // Navigation vers la page de détails du candidat
-        if (applicant && applicant.person && applicant.person.id) {
-            this.router.navigate(['/applicants/view', applicant.person.id]);
+        if (applicant && applicant.id) {
+            this.router.navigate(['/applicants/view', applicant.id]);
         }
     }
 
     update(applicant: Applicant) {
         // Navigation vers la page de modification du candidat
-        if (applicant && applicant.person && applicant.person.id) {
-            this.router.navigate(['/applicants/edit', applicant.person.id]);
+        if (applicant && applicant.id) {
+            this.router.navigate(['/applicants/edit', applicant.id]);
         }
     }
 
     delete(applicant: Applicant) {
         // Confirmer avant suppression
-        if (applicant && applicant.person && applicant.person.id) {
-            const name = applicant.person.name || 'ce candidat';
+        if (applicant && applicant.id) {
+            const name = applicant.name || 'ce candidat';
             if (confirm(`Êtes-vous sûr de vouloir supprimer ${name} ?`)) {
-                this.applicantService.delete(applicant.person.id, {
+                this.applicantService.delete(applicant.id, {
                     next: () => {
                         // Recharger la liste
                         this.load();
@@ -109,13 +109,17 @@ export class ApplicantComponent {
 
     hire(applicant: Applicant) {
         // Confirmer avant embauche
-        if (applicant && applicant.person && applicant.person.id) {
-            const name = applicant.person.name || 'ce candidat';
+        if (applicant && applicant.id) {
+            const name = applicant.name || 'ce candidat';
             if (confirm(`Êtes-vous sûr de vouloir embaucher ${name} ?`)) {
                 // Créer un employé à partir du candidat
                 const employee: Employee = {
-                    id: applicant.person.id,
-                    person: applicant.person,
+                    id: applicant.id,
+                    name: applicant.name,
+                    birth: applicant.birth,
+                    address: applicant.address,
+                    email: applicant.email,
+                    phone: applicant.phone,
                     job: applicant.domain || undefined,
                     salary: 0,
                     contractStart: new Date().toISOString().split('T')[0],
@@ -129,7 +133,7 @@ export class ApplicantComponent {
                     next: () => {
                         alert(`${name} a été embauché avec succès !`);
                         // Supprimer le candidat après embauche réussie
-                        this.applicantService.delete(applicant.person.id, {
+                        this.applicantService.delete(applicant.id, {
                             next: () => {
                                 this.load(); // Recharger la liste
                             },

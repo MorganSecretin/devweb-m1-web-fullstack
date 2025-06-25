@@ -22,7 +22,12 @@ export class ApplicantService {
     create(applicant: Applicant, resultHandler?: ResultHandler<Applicant>): void {
         // Convertir vers le format DTO attendu par le backend
         const applicantDto = {
-            person: applicant.person,
+            id: applicant.id,
+            name: applicant.name,
+            birth: applicant.birth,
+            address: applicant.address,
+            email: applicant.email,
+            phone: applicant.phone,
             note: applicant.note,
             domain: applicant.domain,
             interviewDate: applicant.interviewDate,
@@ -63,7 +68,12 @@ export class ApplicantService {
     update(id: string, applicant: Applicant, resultHandler?: ResultHandler<Applicant>): void {
         // Convertir vers le format DTO attendu par le backend
         const applicantDto = {
-            person: applicant.person,
+            id: applicant.id,
+            name: applicant.name,
+            birth: applicant.birth,
+            address: applicant.address,
+            email: applicant.email,
+            phone: applicant.phone,
             note: applicant.note,
             domain: applicant.domain,
             interviewDate: applicant.interviewDate,
