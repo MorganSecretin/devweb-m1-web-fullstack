@@ -18,11 +18,29 @@ export class ApplicantService {
         });
     }
 
-    // Créer un nouvel employé
+    // Créer un nouvel candidat
     create(applicant: Applicant, resultHandler?: ResultHandler<Applicant>): void {
-        this.http.post<Applicant>(this.apiUrl, applicant).subscribe({
+        // Convertir vers le format DTO attendu par le backend
+        const applicantDto = {
+            person: applicant.person,
+            note: applicant.note,
+            domain: applicant.domain,
+            interviewDate: applicant.interviewDate,
+            comment: applicant.comment
+        };
+        
+        this.http.post<Applicant>(this.apiUrl, applicantDto).subscribe({
             next: (data) => resultHandler?.next?.(data),
-            error: (error) => resultHandler?.error?.(error),
+            error: (error) => {
+                console.error('Erreur création candidat:', error);
+                if (error.status === 409) {
+                    // Erreur de conflit (email ou ID déjà existant)
+                    const message = typeof error.error === 'string' ? error.error : 'Un candidat avec ces informations existe déjà';
+                    resultHandler?.error?.({ ...error, message });
+                } else {
+                    resultHandler?.error?.(error);
+                }
+            },
         });
     }
 
@@ -42,15 +60,44 @@ export class ApplicantService {
         });
     }
 
-    // Mettre à jour un employé
+    // Mettre à jour un candidat
     update(id: string, applicant: Applicant, resultHandler?: ResultHandler<Applicant>): void {
-        this.http.put<Applicant>(`${this.apiUrl}/${id}`, applicant).subscribe({
+        // Convertir vers le format DTO attendu par le backend
+        const applicantDto = {
+            person: applicant.person,
+            note: applicant.note,
+            domain: applicant.domain,
+            interviewDate: applicant.interviewDate,
+            comment: applicant.comment
+        };
+        
+        this.http.put<Applicant>(`${this.apiUrl}/${id}`, applicantDto).subscribe({
             next: (data) => resultHandler?.next?.(data),
-            error: (error) => resultHandler?.error?.(error),
+            error: (error) => {
+                console.error('Erreur mise à jour candidat:', error);
+                if (error.status === 409) {
+                    // Erreur de conflit (email déjà existant)
+                    const message = typeof error.error === 'string' ? error.error : 'Un candidat avec cet email existe déjà';
+                    resultHandler?.error?.({ ...error, message });
+                } else {
+                    resultHandler?.error?.(error);
+                }
+            },
         });
     }
 
-    // Supprimer un employé
+    // Vérifier si un email existe déjà (pour validation côté frontend)
+    checkEmailExists(email: string, resultHandler?: ResultHandler<boolean>): void {
+        this.http.get<boolean>(`${this.apiUrl}/check-email/${encodeURIComponent(email)}`).subscribe({
+            next: (exists) => resultHandler?.next?.(exists),
+            error: (error) => {
+                // En cas d'erreur, on considère que l'email n'existe pas
+                resultHandler?.next?.(false);
+            },
+        });
+    }
+
+    // Supprimer un candidat
     delete(id: string, resultHandler?: ResultHandler<void>): void {
         this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
             next: () => resultHandler?.next?.(),

@@ -4,9 +4,13 @@ import fr.ynov.devweb.dtos.EmployeeDto;
 import fr.ynov.devweb.dtos.PersonDto;
 import fr.ynov.devweb.entities.Employee;
 import fr.ynov.devweb.entities.Person;
+import fr.ynov.devweb.exceptions.DuplicateResourceException;
+import fr.ynov.devweb.exceptions.ResourceNotFoundException;
+import fr.ynov.devweb.exceptions.ValidationException;
 import fr.ynov.devweb.repositories.EmployeeRepository;
 import fr.ynov.devweb.repositories.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,32 +26,66 @@ public class EmployeeService {
     @Autowired
     private PersonRepository personRepository;    // Créer un nouvel employé
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
-        // Créer ou récupérer la personne
-        Person person = convertPersonDtoToEntity(employeeDto.getPerson());
-        person = personRepository.save(person);
+        // Validation des données
+        if (employeeDto.getPerson() == null) {
+            throw new ValidationException("Les informations de la personne sont obligatoires");
+        }
+        if (employeeDto.getPerson().getEmail() == null || employeeDto.getPerson().getEmail().trim().isEmpty()) {
+            throw new ValidationException("L'email est obligatoire");
+        }
+        if (employeeDto.getPerson().getId() == null || employeeDto.getPerson().getId().trim().isEmpty()) {
+            throw new ValidationException("L'ID de la personne est obligatoire");
+        }
+        if (employeeDto.getSalary() != null && employeeDto.getSalary() < 0) {
+            throw new ValidationException("Le salaire ne peut pas être négatif");
+        }
 
-        // Créer l'employé
-        Employee employee = new Employee();
-        employee.setId(person.getId());
-        employee.setJob(employeeDto.getJob());
-        employee.setSalary(employeeDto.getSalary());
-        employee.setContractStart(employeeDto.getContractStart());
-        employee.setContractEnd(employeeDto.getContractEnd());
-        employee.setComment(employeeDto.getComment());
+        try {
+            // Vérifier si un employé avec cet ID existe déjà
+            if (employeeRepository.findById(employeeDto.getPerson().getId()).isPresent()) {
+                throw new DuplicateResourceException("Un employé avec cet ID existe déjà");
+            }
 
-        employee = employeeRepository.save(employee);
-        
-        // Récupérer les données complètes pour le retour
-        PersonDto personDto = convertPersonToDto(person);
-        EmployeeDto result = new EmployeeDto();
-        result.setPerson(personDto);
-        result.setJob(employee.getJob());
-        result.setSalary(employee.getSalary());
-        result.setContractStart(employee.getContractStart());
-        result.setContractEnd(employee.getContractEnd());
-        result.setComment(employee.getComment());
-        
-        return result;
+            // Vérifier si une personne avec cet email existe déjà
+            Optional<Person> existingPersonByEmail = personRepository.findByEmail(employeeDto.getPerson().getEmail());
+            if (existingPersonByEmail.isPresent()) {
+                throw new DuplicateResourceException("Une personne avec cet email existe déjà");
+            }
+
+            // Créer ou récupérer la personne
+            Person person = convertPersonDtoToEntity(employeeDto.getPerson());
+            person = personRepository.save(person);
+
+            // Créer l'employé
+            Employee employee = new Employee();
+            employee.setId(person.getId());
+            employee.setJob(employeeDto.getJob());
+            employee.setSalary(employeeDto.getSalary());
+            employee.setContractStart(employeeDto.getContractStart());
+            employee.setContractEnd(employeeDto.getContractEnd());
+            employee.setComment(employeeDto.getComment());
+
+            employee = employeeRepository.save(employee);
+            
+            // Récupérer les données complètes pour le retour
+            PersonDto personDto = convertPersonToDto(person);
+            EmployeeDto result = new EmployeeDto();
+            result.setPerson(personDto);
+            result.setJob(employee.getJob());
+            result.setSalary(employee.getSalary());
+            result.setContractStart(employee.getContractStart());
+            result.setContractEnd(employee.getContractEnd());
+            result.setComment(employee.getComment());
+            
+            return result;
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage() != null && e.getMessage().contains("EMAIL")) {
+                throw new DuplicateResourceException("Un employé avec cet email existe déjà");
+            } else if (e.getMessage() != null && e.getMessage().contains("PRIMARY")) {
+                throw new DuplicateResourceException("Un employé avec cet ID existe déjà");
+            }
+            throw new ValidationException("Erreur de validation des données");
+        }
     }
 
     // Lire tous les employés
@@ -56,22 +94,45 @@ public class EmployeeService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }    // Lire un employé par ID (Person)
-    public Optional<EmployeeDto> getEmployeeById(String personId) {
+    public EmployeeDto getEmployeeById(String personId) {
+        if (personId == null || personId.trim().isEmpty()) {
+            throw new ValidationException("L'ID de l'employé est obligatoire");
+        }
+        
         return employeeRepository.findById(personId)
-                .map(this::convertToDto);
+                .map(this::convertToDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Employé non trouvé avec l'ID: " + personId));
     }    // Mettre à jour un employé
-    public Optional<EmployeeDto> updateEmployee(String personId, EmployeeDto employeeDto) {
-        Optional<Employee> employeeOpt = employeeRepository.findById(personId);
-        if (employeeOpt.isPresent()) {
-            Employee employee = employeeOpt.get();
+    public EmployeeDto updateEmployee(String personId, EmployeeDto employeeDto) {
+        if (personId == null || personId.trim().isEmpty()) {
+            throw new ValidationException("L'ID de l'employé est obligatoire");
+        }
+        if (employeeDto.getPerson() == null) {
+            throw new ValidationException("Les informations de la personne sont obligatoires");
+        }
+        if (employeeDto.getPerson().getEmail() == null || employeeDto.getPerson().getEmail().trim().isEmpty()) {
+            throw new ValidationException("L'email est obligatoire");
+        }
+        if (employeeDto.getSalary() != null && employeeDto.getSalary() < 0) {
+            throw new ValidationException("Le salaire ne peut pas être négatif");
+        }
+
+        try {
+            Employee employee = employeeRepository.findById(personId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Employé non trouvé avec l'ID: " + personId));
             
             // Mettre à jour les données de la personne
-            Optional<Person> personOpt = personRepository.findById(personId);
-            if (personOpt.isPresent()) {
-                Person person = personOpt.get();
-                updatePersonFromDto(person, employeeDto.getPerson());
-                personRepository.save(person);
+            Person person = personRepository.findById(personId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Personne non trouvée avec l'ID: " + personId));
+            
+            // Vérifier si l'email est déjà utilisé par une autre personne
+            Optional<Person> existingPersonByEmail = personRepository.findByEmail(employeeDto.getPerson().getEmail());
+            if (existingPersonByEmail.isPresent() && !existingPersonByEmail.get().getId().equals(personId)) {
+                throw new DuplicateResourceException("Une personne avec cet email existe déjà");
             }
+            
+            updatePersonFromDto(person, employeeDto.getPerson());
+            personRepository.save(person);
             
             // Mettre à jour les données de l'employé
             employee.setJob(employeeDto.getJob());
@@ -81,19 +142,25 @@ public class EmployeeService {
             employee.setComment(employeeDto.getComment());
             
             employee = employeeRepository.save(employee);
-            return Optional.of(convertToDto(employee));
+            return convertToDto(employee);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage() != null && e.getMessage().contains("EMAIL")) {
+                throw new DuplicateResourceException("Un employé avec cet email existe déjà");
+            }
+            throw new ValidationException("Erreur de validation des données");
         }
-        return Optional.empty();
     }
 
     // Supprimer un employé
-    public boolean deleteEmployee(String personId) {
-        Optional<Employee> employee = employeeRepository.findById(personId);
-        if (employee.isPresent()) {
-            employeeRepository.delete(employee.get());
-            return true;
+    public void deleteEmployee(String personId) {
+        if (personId == null || personId.trim().isEmpty()) {
+            throw new ValidationException("L'ID de l'employé est obligatoire");
         }
-        return false;
+        
+        Employee employee = employeeRepository.findById(personId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employé non trouvé avec l'ID: " + personId));
+        
+        employeeRepository.delete(employee);
     }    // Convertir Employee vers EmployeeDto
     private EmployeeDto convertToDto(Employee employee) {
         Optional<Person> personOpt = personRepository.findById(employee.getId());

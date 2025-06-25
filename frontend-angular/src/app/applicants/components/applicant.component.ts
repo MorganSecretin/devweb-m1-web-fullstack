@@ -116,9 +116,9 @@ export class ApplicantComponent {
                 const employee: Employee = {
                     id: applicant.person.id,
                     person: applicant.person,
-                    job: applicant.domain || '', // Utiliser le domaine comme poste initial
-                    salary: 0, // Salaire initial à 0, à modifier ensuite
-                    contractStart: new Date().toISOString().split('T')[0], // Date d'aujourd'hui
+                    job: applicant.domain || undefined,
+                    salary: 0,
+                    contractStart: new Date().toISOString().split('T')[0],
                     contractEnd: null,
                     comment: `Embauché depuis la candidature. Note: ${applicant.note !== undefined ? applicant.note + '/20' : 'N/A'}`,
                     vacations: [],

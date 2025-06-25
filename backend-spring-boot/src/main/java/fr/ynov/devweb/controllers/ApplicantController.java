@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/applicants")
@@ -27,70 +26,38 @@ public class ApplicantController {
     // Créer un nouveau candidat
     @PostMapping
     public ResponseEntity<ApplicantDto> createApplicant(@RequestBody ApplicantDto applicantDto) {
-        try {
-            ApplicantDto createdApplicant = applicantService.createApplicant(applicantDto);
-            return new ResponseEntity<>(createdApplicant, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ApplicantDto createdApplicant = applicantService.createApplicant(applicantDto);
+        return new ResponseEntity<>(createdApplicant, HttpStatus.CREATED);
     }
 
     // Obtenir tous les candidats
     @GetMapping
     public ResponseEntity<List<ApplicantDto>> getAllApplicants() {
-        try {
-            List<ApplicantDto> applicants = applicantService.getAllApplicants();
-            if (applicants.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(applicants, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        List<ApplicantDto> applicants = applicantService.getAllApplicants();
+        if (applicants.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        return new ResponseEntity<>(applicants, HttpStatus.OK);
     }
 
     // Obtenir un candidat par ID
     @GetMapping("/{id}")
     public ResponseEntity<ApplicantDto> getApplicantById(@PathVariable("id") String id) {
-        try {
-            Optional<ApplicantDto> applicant = applicantService.getApplicantById(id);
-            if (applicant.isPresent()) {
-                return new ResponseEntity<>(applicant.get(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ApplicantDto applicant = applicantService.getApplicantById(id);
+        return new ResponseEntity<>(applicant, HttpStatus.OK);
     }
 
     // Mettre à jour un candidat
     @PutMapping("/{id}")
     public ResponseEntity<ApplicantDto> updateApplicant(@PathVariable("id") String id, @RequestBody ApplicantDto applicantDto) {
-        try {
-            Optional<ApplicantDto> updatedApplicant = applicantService.updateApplicant(id, applicantDto);
-            if (updatedApplicant.isPresent()) {
-                return new ResponseEntity<>(updatedApplicant.get(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ApplicantDto updatedApplicant = applicantService.updateApplicant(id, applicantDto);
+        return new ResponseEntity<>(updatedApplicant, HttpStatus.OK);
     }
 
     // Supprimer un candidat
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteApplicant(@PathVariable("id") String id) {
-        try {
-            boolean deleted = applicantService.deleteApplicant(id);
-            if (deleted) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        applicantService.deleteApplicant(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

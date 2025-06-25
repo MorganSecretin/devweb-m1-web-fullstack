@@ -2,15 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 import { Applicant } from '@app/applicants/models/applicant.model';
 import { ApplicantService } from '@app/applicants/services/applicants.service';
 
 @Component({
   selector: 'app-applicant-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastModule],
+  providers: [MessageService],
   template: `
     <div class="container mx-auto p-6">
+      <p-toast></p-toast>
       <div class="bg-white shadow-lg rounded-lg p-6">
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-3xl font-bold text-gray-900">
@@ -156,10 +160,6 @@ import { ApplicantService } from '@app/applicants/services/applicants.service';
             </div>
           </div>
 
-          <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {{ error }}
-          </div>
-
           <div class="flex justify-end space-x-4">
             <button 
               type="button"
@@ -183,14 +183,14 @@ export class ApplicantEditComponent implements OnInit {
   applicantForm: FormGroup;
   isEditMode = false;
   loading = false;
-  error: string | null = null;
   applicantId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private applicantService: ApplicantService
+    private applicantService: ApplicantService,
+    private messageService: MessageService
   ) {
     this.applicantForm = this.createForm();
   }
@@ -221,7 +221,6 @@ export class ApplicantEditComponent implements OnInit {
 
   private loadApplicant(id: string): void {
     this.loading = true;
-    this.error = null;
 
     this.applicantService.getById(id, {
       next: (applicant) => {
@@ -242,7 +241,11 @@ export class ApplicantEditComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'Erreur lors du chargement du candidat';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Erreur lors du chargement du candidat'
+        });
         this.loading = false;
         console.error('Error loading applicant:', error);
       }
@@ -252,7 +255,6 @@ export class ApplicantEditComponent implements OnInit {
   onSubmit(): void {
     if (this.applicantForm.valid) {
       this.loading = true;
-      this.error = null;
 
       const formData = this.applicantForm.value;
       const applicant: Applicant = {
@@ -274,10 +276,19 @@ export class ApplicantEditComponent implements OnInit {
       const resultHandler = {
         next: () => {
           this.loading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: `Candidat ${this.isEditMode ? 'modifié' : 'créé'} avec succès`
+          });
           this.router.navigate(['/applicants']);
         },
         error: (error: any) => {
-          this.error = 'Erreur lors de l\'enregistrement du candidat';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: error.message || 'Erreur lors de l\'enregistrement du candidat'
+          });
           this.loading = false;
           console.error('Error saving applicant:', error);
         }

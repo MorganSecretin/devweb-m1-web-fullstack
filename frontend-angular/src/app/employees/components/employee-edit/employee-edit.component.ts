@@ -2,15 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
 import { Employee } from '@app/employees/models/employee.model';
 import { EmployeeService } from '@app/employees/services/employee.service';
 
 @Component({
   selector: 'app-employee-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, Toast],
+  providers: [MessageService],
   template: `
     <div class="container mx-auto p-6">
+      <p-toast></p-toast>
       <div class="bg-white shadow-lg rounded-lg p-6">
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-3xl font-bold text-gray-900">
@@ -173,10 +177,6 @@ import { EmployeeService } from '@app/employees/services/employee.service';
             </div>
           </div>
 
-          <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {{ error }}
-          </div>
-
           <div class="flex justify-end space-x-4">
             <button 
               type="button"
@@ -200,14 +200,14 @@ export class EmployeeEditComponent implements OnInit {
   employeeForm: FormGroup;
   isEditMode = false;
   loading = false;
-  error: string | null = null;
   employeeId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private employeeService: EmployeeService
+    private employeeService: EmployeeService,
+    private messageService: MessageService
   ) {
     this.employeeForm = this.createForm();
   }
@@ -239,7 +239,6 @@ export class EmployeeEditComponent implements OnInit {
 
   private loadEmployee(id: string): void {
     this.loading = true;
-    this.error = null;
 
     this.employeeService.getById(id, {
       next: (employee) => {
@@ -261,7 +260,11 @@ export class EmployeeEditComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'Erreur lors du chargement de l\'employé';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Erreur lors du chargement de l\'employé'
+        });
         this.loading = false;
         console.error('Error loading employee:', error);
       }
@@ -271,7 +274,6 @@ export class EmployeeEditComponent implements OnInit {
   onSubmit(): void {
     if (this.employeeForm.valid) {
       this.loading = true;
-      this.error = null;
 
       const formData = this.employeeForm.value;
       const employee: Employee = {
@@ -296,10 +298,19 @@ export class EmployeeEditComponent implements OnInit {
       const resultHandler = {
         next: () => {
           this.loading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: `Employé ${this.isEditMode ? 'modifié' : 'créé'} avec succès`
+          });
           this.router.navigate(['/employees']);
         },
         error: (error: any) => {
-          this.error = 'Erreur lors de l\'enregistrement de l\'employé';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: error.message || 'Erreur lors de l\'enregistrement de l\'employé'
+          });
           this.loading = false;
           console.error('Error saving employee:', error);
         }

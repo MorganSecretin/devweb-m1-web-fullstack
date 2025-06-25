@@ -2,6 +2,10 @@ package fr.ynov.devweb.services;
 
 import fr.ynov.devweb.configs.jwts.JwtTokenProvider;
 import fr.ynov.devweb.entities.User;
+import fr.ynov.devweb.exceptions.DuplicateResourceException;
+import fr.ynov.devweb.exceptions.InvalidCredentialsException;
+import fr.ynov.devweb.exceptions.ResourceNotFoundException;
+import fr.ynov.devweb.exceptions.ValidationException;
 import fr.ynov.devweb.repositories.UserRepository;
 
 import java.util.List;
@@ -9,7 +13,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,7 +22,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -44,15 +46,27 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé : " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé : " + username));
     }
 
 
 
     public boolean verifiyUser(String email, String password) {
-        return userRepository.findByEmail(email).map(user -> passwordEncoder.matches(password, user.getPassword())).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé : " + email)
-        );
+        if (email == null || email.trim().isEmpty()) {
+            throw new ValidationException("L'email est obligatoire");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            throw new ValidationException("Le mot de passe est obligatoire");
+        }
+        
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé : " + email));
+        
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new InvalidCredentialsException("Mot de passe incorrect");
+        }
+        
+        return true;
     }
 
     public boolean checkUserNameExists(String email) {
@@ -61,9 +75,23 @@ public class UserService implements UserDetailsService {
 
 
     public boolean createUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists : " + user.getEmail());
+        if (user == null) {
+            throw new ValidationException("Les données de l'utilisateur sont obligatoires");
         }
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new ValidationException("L'email est obligatoire");
+        }
+        if (!user.getEmail().contains("@")) {
+            throw new ValidationException("Format d'email invalide");
+        }
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            throw new ValidationException("Le mot de passe est obligatoire");
+        }
+        
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new DuplicateResourceException("Un utilisateur avec cet email existe déjà : " + user.getEmail());
+        }
+        
         System.out.println("---> Creating user: " + user.getEmail());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -72,17 +100,26 @@ public class UserService implements UserDetailsService {
     }
 
     public User saveUser(User user) {
-        if (!user.getEmail().contains("@")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email format: " + user.getEmail());
+        if (user == null) {
+            throw new ValidationException("Les données de l'utilisateur sont obligatoires");
+        }
+        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            throw new ValidationException("Format d'email invalide : " + user.getEmail());
         }
         return userRepository.save(user);
     }
 
     public String generateToken(String email, String password) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new ValidationException("L'email est obligatoire");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            throw new ValidationException("Le mot de passe est obligatoire");
+        }
+        
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtTokenProvider.generateToken(authentication);
-
     }
 
     public List<User> getAllUsers() {
@@ -90,23 +127,37 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> getUserById(Long id) {
+        if (id == null) {
+            throw new ValidationException("L'ID de l'utilisateur est obligatoire");
+        }
         return userRepository.findById(id);
     }
 
     public void deleteUserById(Long id) {
-        if(userRepository.findById(id).isPresent()){
-            userRepository.deleteById(id);
-        }else{
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
+        if (id == null) {
+            throw new ValidationException("L'ID de l'utilisateur est obligatoire");
         }
+        
+        if (!userRepository.findById(id).isPresent()) {
+            throw new ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + id);
+        }
+        
+        userRepository.deleteById(id);
     }
 
     public User updateUser(Long id, User user) {
-        if (userRepository.findById(id).isPresent()) {
-            user.setId(id);
-            return userRepository.save(user);
-        }else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
+        if (id == null) {
+            throw new ValidationException("L'ID de l'utilisateur est obligatoire");
         }
+        if (user == null) {
+            throw new ValidationException("Les données de l'utilisateur sont obligatoires");
+        }
+        
+        if (!userRepository.findById(id).isPresent()) {
+            throw new ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + id);
+        }
+        
+        user.setId(id);
+        return userRepository.save(user);
     }
 }

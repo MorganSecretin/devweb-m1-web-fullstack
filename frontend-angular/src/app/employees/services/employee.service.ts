@@ -20,9 +20,28 @@ export class EmployeeService {
 
     // Créer un nouvel employé
     create(employee: Employee, resultHandler?: ResultHandler<Employee>): void {
-        this.http.post<Employee>(this.apiUrl, employee).subscribe({
+        // Convertir vers le format DTO attendu par le backend
+        const employeeDto = {
+            person: employee.person,
+            job: employee.job,
+            salary: employee.salary,
+            contractStart: employee.contractStart,
+            contractEnd: employee.contractEnd,
+            comment: employee.comment
+        };
+        
+        this.http.post<Employee>(this.apiUrl, employeeDto).subscribe({
             next: (data) => resultHandler?.next?.(data),
-            error: (error) => resultHandler?.error?.(error),
+            error: (error) => {
+                console.error('Erreur création employé:', error);
+                if (error.status === 409) {
+                    // Erreur de conflit (email ou ID déjà existant)
+                    const message = typeof error.error === 'string' ? error.error : 'Un employé avec ces informations existe déjà';
+                    resultHandler?.error?.({ ...error, message });
+                } else {
+                    resultHandler?.error?.(error);
+                }
+            },
         });
     }
 
@@ -44,9 +63,39 @@ export class EmployeeService {
 
     // Mettre à jour un employé
     update(id: string, employee: Employee, resultHandler?: ResultHandler<Employee>): void {
-        this.http.put<Employee>(`${this.apiUrl}/${id}`, employee).subscribe({
+        // Convertir vers le format DTO attendu par le backend
+        const employeeDto = {
+            person: employee.person,
+            job: employee.job,
+            salary: employee.salary,
+            contractStart: employee.contractStart,
+            contractEnd: employee.contractEnd,
+            comment: employee.comment
+        };
+        
+        this.http.put<Employee>(`${this.apiUrl}/${id}`, employeeDto).subscribe({
             next: (data) => resultHandler?.next?.(data),
-            error: (error) => resultHandler?.error?.(error),
+            error: (error) => {
+                console.error('Erreur mise à jour employé:', error);
+                if (error.status === 409) {
+                    // Erreur de conflit (email déjà existant)
+                    const message = typeof error.error === 'string' ? error.error : 'Un employé avec cet email existe déjà';
+                    resultHandler?.error?.({ ...error, message });
+                } else {
+                    resultHandler?.error?.(error);
+                }
+            },
+        });
+    }
+
+    // Vérifier si un email existe déjà (pour validation côté frontend)
+    checkEmailExists(email: string, resultHandler?: ResultHandler<boolean>): void {
+        this.http.get<boolean>(`${this.apiUrl}/check-email/${encodeURIComponent(email)}`).subscribe({
+            next: (exists) => resultHandler?.next?.(exists),
+            error: (error) => {
+                // En cas d'erreur, on considère que l'email n'existe pas
+                resultHandler?.next?.(false);
+            },
         });
     }
 
