@@ -1,14 +1,11 @@
 package fr.ynov.devweb.entities;
 
-import jakarta.annotation.Nullable;
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "applicants")
@@ -18,28 +15,32 @@ import java.time.LocalDate;
 public class Applicant {
     @Id
     @Column(length = 4, unique = true, nullable = false)
-    private String id; // Same as Person ID
-    
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "id", nullable = false)
-    @MapsId
-    private Person person;
+    private String id;
 
-    @Min(0)
-    @Max(10)
-    @Nullable()
+    @Column()
+    private String name;
+
+    @Column()
+    private LocalDate birth;
+
+    @Column()
+    private String address;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(length = 10)
+    private String phone;
+
     @Column()
     private Integer note;
 
-    @Nullable()
     @Column()
     private String domain;
 
-    @Nullable()
     @Column()
     private LocalDate interviewDate;
 
-    @Nullable()
     @Column()
     private String comment;
 }

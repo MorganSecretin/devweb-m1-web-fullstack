@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,7 +26,7 @@ public class EmployeeController {
 
     // Créer un nouvel employé
     @PostMapping
-    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<EmployeeDto> createEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
         EmployeeDto createdEmployee = employeeService.createEmployee(employeeDto);
         return new ResponseEntity<>(createdEmployee, HttpStatus.CREATED);
     }
@@ -49,7 +50,7 @@ public class EmployeeController {
 
     // Mettre à jour un employé
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") String id, @RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") String id, @Valid @RequestBody EmployeeDto employeeDto) {
         EmployeeDto updatedEmployee = employeeService.updateEmployee(id, employeeDto);
         return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
     }

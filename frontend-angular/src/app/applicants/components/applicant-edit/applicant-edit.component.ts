@@ -243,7 +243,7 @@ export class ApplicantEditComponent implements OnInit {
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erreur',
+          summary: 'Erreur', 
           detail: 'Erreur lors du chargement du candidat'
         });
         this.loading = false;

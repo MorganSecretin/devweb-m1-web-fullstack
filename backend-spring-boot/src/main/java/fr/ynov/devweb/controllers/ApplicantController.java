@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,7 +26,7 @@ public class ApplicantController {
 
     // Créer un nouveau candidat
     @PostMapping
-    public ResponseEntity<ApplicantDto> createApplicant(@RequestBody ApplicantDto applicantDto) {
+    public ResponseEntity<ApplicantDto> createApplicant(@Valid @RequestBody ApplicantDto applicantDto) {
         ApplicantDto createdApplicant = applicantService.createApplicant(applicantDto);
         return new ResponseEntity<>(createdApplicant, HttpStatus.CREATED);
     }
@@ -49,7 +50,7 @@ public class ApplicantController {
 
     // Mettre à jour un candidat
     @PutMapping("/{id}")
-    public ResponseEntity<ApplicantDto> updateApplicant(@PathVariable("id") String id, @RequestBody ApplicantDto applicantDto) {
+    public ResponseEntity<ApplicantDto> updateApplicant(@PathVariable("id") String id, @Valid @RequestBody ApplicantDto applicantDto) {
         ApplicantDto updatedApplicant = applicantService.updateApplicant(id, applicantDto);
         return new ResponseEntity<>(updatedApplicant, HttpStatus.OK);
     }

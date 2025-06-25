@@ -1,13 +1,11 @@
 package fr.ynov.devweb.entities;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
-
 
 @Entity
 @Table(name = "employees")
@@ -17,38 +15,41 @@ import java.util.List;
 public class Employee {
     @Id
     @Column(length = 4, unique = true, nullable = false)
-    private String id; // Same as Person ID
-    
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "id", nullable = false)
-    @MapsId
-    private Person person;
+    private String id;
 
-    @Nullable()
+    @Column()
+    private String name;
+
+    @Column()
+    private LocalDate birth;
+
+    @Column()
+    private String address;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(length = 10)
+    private String phone;
+
     @Column()
     private String job;
 
-    @Nullable()
     @Column()
     private Float salary;
 
-    @Nullable()
     @Column()
     private LocalDate contractStart;
 
-    @Nullable()
     @Column()
     private LocalDate contractEnd;
     
-    @Nullable()
     @Column()
     private String comment;
 
-    @Nullable()
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vacation> vacations;
 
-    @Nullable()
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Absence> absences;
 }

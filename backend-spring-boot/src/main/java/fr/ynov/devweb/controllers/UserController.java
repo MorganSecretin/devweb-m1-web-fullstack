@@ -4,6 +4,7 @@ import fr.ynov.devweb.dtos.UserLoginDto;
 import fr.ynov.devweb.entities.User;
 import fr.ynov.devweb.services.UserService;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,13 +24,13 @@ public class UserController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
         userService.createUser(user);
         return new ResponseEntity<>("Utilisateur créé avec succès", HttpStatus.CREATED);
     }
 
     @PostMapping("login")
-    public ResponseEntity<String> loginUser(@RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<String> loginUser(@Valid @RequestBody UserLoginDto userLoginDto) {
         if (userService.checkUserNameExists(userLoginDto.getEmail())) {
             if (userService.verifiyUser(userLoginDto.getEmail(), userLoginDto.getPassword())) {
                 String token = userService.generateToken(userLoginDto.getEmail(), userLoginDto.getPassword());
