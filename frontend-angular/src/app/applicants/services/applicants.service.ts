@@ -32,7 +32,6 @@ export class ApplicantService {
         this.http.post<Applicant>(this.apiUrl, applicantDto).subscribe({
             next: (data) => resultHandler?.next?.(data),
             error: (error) => {
-                console.error('Erreur création candidat:', error);
                 if (error.status === 409) {
                     // Erreur de conflit (email ou ID déjà existant)
                     const message = typeof error.error === 'string' ? error.error : 'Un candidat avec ces informations existe déjà';

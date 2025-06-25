@@ -27,6 +27,7 @@ public class ApplicantController {
     // Créer un nouveau candidat
     @PostMapping
     public ResponseEntity<ApplicantDto> createApplicant(@Valid @RequestBody ApplicantDto applicantDto) {
+        System.out.println("/n/n Création d'un candidat : " + applicantDto+ "\n\n");
         ApplicantDto createdApplicant = applicantService.createApplicant(applicantDto);
         return new ResponseEntity<>(createdApplicant, HttpStatus.CREATED);
     }
