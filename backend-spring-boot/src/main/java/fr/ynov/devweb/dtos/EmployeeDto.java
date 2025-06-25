@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.validation.constraints.*;
 
@@ -43,4 +44,8 @@ public class EmployeeDto {
     
     @Size(max = 500, message = "Commentaire trop long")
     private String comment;
+    
+    private List<VacationDto> vacations;
+    
+    private List<AbsenceDto> absences;
 }

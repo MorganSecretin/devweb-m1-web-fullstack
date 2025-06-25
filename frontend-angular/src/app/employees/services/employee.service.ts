@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { ResultHandler } from '@app/utils/services/result-handler.type';
 import { Employee } from '@app/employees/models/employee.model';
+import { Absence } from '@app/employees/models/abscence.model';
+import { Vacation } from '@app/employees/models/vacation.model';
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeService {
@@ -113,6 +115,22 @@ export class EmployeeService {
     delete(id: string, resultHandler?: ResultHandler<void>): void {
         this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
             next: () => resultHandler?.next?.(),
+            error: (error) => resultHandler?.error?.(error),
+        });
+    }
+
+    // Ajouter une absence à un employé
+    addAbsenceToEmployee(employeeId: string, absence: Omit<Absence, 'id'>, resultHandler?: ResultHandler<Employee>): void {
+        this.http.post<Employee>(`${this.apiUrl}/${employeeId}/absences`, absence).subscribe({
+            next: (data) => resultHandler?.next?.(data),
+            error: (error) => resultHandler?.error?.(error),
+        });
+    }
+
+    // Ajouter un congé à un employé
+    addVacationToEmployee(employeeId: string, vacation: Omit<Vacation, 'id'>, resultHandler?: ResultHandler<Employee>): void {
+        this.http.post<Employee>(`${this.apiUrl}/${employeeId}/vacations`, vacation).subscribe({
+            next: (data) => resultHandler?.next?.(data),
             error: (error) => resultHandler?.error?.(error),
         });
     }

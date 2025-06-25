@@ -1,6 +1,8 @@
 package fr.ynov.devweb.controllers;
 
 import fr.ynov.devweb.dtos.EmployeeDto;
+import fr.ynov.devweb.dtos.AbsenceDto;
+import fr.ynov.devweb.dtos.VacationDto;
 import fr.ynov.devweb.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,5 +62,19 @@ public class EmployeeController {
     public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable("id") String id) {
         employeeService.deleteEmployee(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Ajouter une absence à un employé
+    @PostMapping("/{id}/absences")
+    public ResponseEntity<EmployeeDto> addAbsenceToEmployee(@PathVariable("id") String id, @Valid @RequestBody AbsenceDto absenceDto) {
+        EmployeeDto updatedEmployee = employeeService.addAbsenceToEmployee(id, absenceDto);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+    }
+
+    // Ajouter un congé à un employé
+    @PostMapping("/{id}/vacations")
+    public ResponseEntity<EmployeeDto> addVacationToEmployee(@PathVariable("id") String id, @Valid @RequestBody VacationDto vacationDto) {
+        EmployeeDto updatedEmployee = employeeService.addVacationToEmployee(id, vacationDto);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
     }
 }

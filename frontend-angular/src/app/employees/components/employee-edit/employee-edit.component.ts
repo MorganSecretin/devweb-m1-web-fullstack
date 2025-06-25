@@ -18,7 +18,7 @@ import { EmployeeService } from '@app/employees/services/employee.service';
       <div class="bg-white shadow-lg rounded-lg p-6">
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-3xl font-bold text-gray-900">
-            {{ isEditMode ? 'Modifier l\'Employé' : 'Nouvel Employé' }}
+            {{ isEditMode ? "Modifier l'Employé" : "Nouvel Employé" }}
           </h1>
           <button 
             (click)="goBack()"

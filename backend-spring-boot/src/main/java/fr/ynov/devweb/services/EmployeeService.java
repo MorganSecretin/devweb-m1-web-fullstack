@@ -1,7 +1,11 @@
 package fr.ynov.devweb.services;
 
 import fr.ynov.devweb.dtos.EmployeeDto;
+import fr.ynov.devweb.dtos.AbsenceDto;
+import fr.ynov.devweb.dtos.VacationDto;
 import fr.ynov.devweb.entities.Employee;
+import fr.ynov.devweb.entities.Absence;
+import fr.ynov.devweb.entities.Vacation;
 import fr.ynov.devweb.exceptions.DuplicateResourceException;
 import fr.ynov.devweb.exceptions.ResourceNotFoundException;
 import fr.ynov.devweb.repositories.EmployeeRepository;
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 public class EmployeeService {
@@ -44,6 +49,40 @@ public class EmployeeService {
                 .collect(Collectors.toList());
     }
 
+    public EmployeeDto addAbsenceToEmployee(String employeeId, AbsenceDto absenceDto) {
+        Employee employee = findEmployeeById(employeeId);
+        
+        Absence absence = new Absence();
+        absence.setDate(absenceDto.getDate());
+        absence.setDescription(absenceDto.getDescription());
+        absence.setEmployee(employee);
+        
+        if (employee.getAbsences() == null) {
+            employee.setAbsences(new ArrayList<>());
+        }
+        employee.getAbsences().add(absence);
+        
+        Employee savedEmployee = employeeRepository.save(employee);
+        return toDto(savedEmployee);
+    }
+
+    public EmployeeDto addVacationToEmployee(String employeeId, VacationDto vacationDto) {
+        Employee employee = findEmployeeById(employeeId);
+        
+        Vacation vacation = new Vacation();
+        vacation.setStartDate(vacationDto.getStartDate());
+        vacation.setEndDate(vacationDto.getEndDate());
+        vacation.setEmployee(employee);
+        
+        if (employee.getVacations() == null) {
+            employee.setVacations(new ArrayList<>());
+        }
+        employee.getVacations().add(vacation);
+        
+        Employee savedEmployee = employeeRepository.save(employee);
+        return toDto(savedEmployee);
+    }
+
     private void checkDuplicates(EmployeeDto dto) {
         if (employeeRepository.findById(dto.getId()).isPresent())
             throw new DuplicateResourceException("Employé avec cet ID existe déjà");
@@ -65,12 +104,50 @@ public class EmployeeService {
     }
 
     private EmployeeDto toDto(Employee employee) {
-        return new EmployeeDto(
-                employee.getId(), employee.getName(), employee.getBirth(),
-                employee.getAddress(), employee.getEmail(), employee.getPhone(),
-                employee.getJob(), employee.getSalary(), employee.getContractStart(),
-                employee.getContractEnd(), employee.getComment()
-        );
+        EmployeeDto dto = new EmployeeDto();
+        dto.setId(employee.getId());
+        dto.setName(employee.getName());
+        dto.setBirth(employee.getBirth());
+        dto.setAddress(employee.getAddress());
+        dto.setEmail(employee.getEmail());
+        dto.setPhone(employee.getPhone());
+        dto.setJob(employee.getJob());
+        dto.setSalary(employee.getSalary());
+        dto.setContractStart(employee.getContractStart());
+        dto.setContractEnd(employee.getContractEnd());
+        dto.setComment(employee.getComment());
+        
+        // Convertir les vacations
+        if (employee.getVacations() != null) {
+            dto.setVacations(employee.getVacations().stream()
+                .map(this::vacationToDto)
+                .collect(Collectors.toList()));
+        }
+        
+        // Convertir les absences
+        if (employee.getAbsences() != null) {
+            dto.setAbsences(employee.getAbsences().stream()
+                .map(this::absenceToDto)
+                .collect(Collectors.toList()));
+        }
+        
+        return dto;
+    }
+
+    private VacationDto vacationToDto(Vacation vacation) {
+        VacationDto dto = new VacationDto();
+        dto.setId(vacation.getId());
+        dto.setStartDate(vacation.getStartDate());
+        dto.setEndDate(vacation.getEndDate());
+        return dto;
+    }
+
+    private AbsenceDto absenceToDto(Absence absence) {
+        AbsenceDto dto = new AbsenceDto();
+        dto.setId(absence.getId());
+        dto.setDate(absence.getDate());
+        dto.setDescription(absence.getDescription());
+        return dto;
     }
 
     private Employee fromDto(EmployeeDto dto) {

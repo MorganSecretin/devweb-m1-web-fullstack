@@ -1,13 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Employee } from '@app/employees/models/employee.model';
+import { Absence } from '@app/employees/models/abscence.model';
+import { Vacation } from '@app/employees/models/vacation.model';
 import { EmployeeService } from '@app/employees/services/employee.service';
+
+// PrimeNG imports
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { CalendarModule } from 'primeng/calendar';
+import { TextareaModule } from 'primeng/textarea';
 
 @Component({
   selector: 'app-employee-view',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule, 
+    FormsModule,
+    DialogModule, 
+    ButtonModule, 
+    InputTextModule, 
+    TextareaModule,
+    CalendarModule
+  ],
   template: `
     <div class="container mx-auto p-6">
       <div class="bg-white shadow-lg rounded-lg p-6">
@@ -18,6 +36,16 @@ import { EmployeeService } from '@app/employees/services/employee.service';
               (click)="editEmployee()"
               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Modifier
+            </button>
+            <button 
+              (click)="showAbsenceDialog()"
+              class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
+              Ajouter Retard
+            </button>
+            <button 
+              (click)="showVacationDialog()"
+              class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+              Ajouter Congé
             </button>
             <button 
               (click)="goBack()"
@@ -148,12 +176,118 @@ import { EmployeeService } from '@app/employees/services/employee.service';
         </div>
       </div>
     </div>
+
+    <!-- Dialog pour ajouter une absence -->
+    <p-dialog header="Ajouter un Retard" [(visible)]="absenceDialogVisible" [modal]="true" [style]="{width: '450px'}">
+      <div class="space-y-4">
+        <div>
+          <label for="absenceDate" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+          <p-calendar 
+            id="absenceDate"
+            [(ngModel)]="newAbsence.date" 
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="Sélectionner une date"
+            appendTo="body"
+            class="w-full">
+          </p-calendar>
+        </div>
+        <div>
+          <label for="absenceDescription" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <textarea 
+            id="absenceDescription"
+            [(ngModel)]="newAbsence.description" 
+            pInputTextarea
+            rows="3"
+            placeholder="Description du retard"
+            class="w-full">
+          </textarea>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+        <button 
+          pButton 
+          type="button" 
+          label="Annuler" 
+          class="p-button-text"
+          (click)="absenceDialogVisible = false">
+        </button>
+        <button 
+          pButton 
+          type="button" 
+          label="Enregistrer" 
+          (click)="saveAbsence()"
+          [disabled]="!newAbsence.date">
+        </button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Dialog pour ajouter un congé -->
+    <p-dialog header="Ajouter un Congé" [(visible)]="vacationDialogVisible" [modal]="true" [style]="{width: '450px'}">
+      <div class="space-y-4">
+        <div>
+          <label for="vacationStartDate" class="block text-sm font-medium text-gray-700 mb-2">Date de début</label>
+          <p-calendar 
+            id="vacationStartDate"
+            [(ngModel)]="newVacation.startDate" 
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="Sélectionner la date de début"
+            appendTo="body"
+            class="w-full">
+          </p-calendar>
+        </div>
+        <div>
+          <label for="vacationEndDate" class="block text-sm font-medium text-gray-700 mb-2">Date de fin</label>
+          <p-calendar 
+            id="vacationEndDate"
+            [(ngModel)]="newVacation.endDate" 
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="Sélectionner la date de fin"
+            appendTo="body"
+            class="w-full">
+          </p-calendar>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+        <button 
+          pButton 
+          type="button" 
+          label="Annuler" 
+          class="p-button-text"
+          (click)="vacationDialogVisible = false">
+        </button>
+        <button 
+          pButton 
+          type="button" 
+          label="Enregistrer" 
+          (click)="saveVacation()"
+          [disabled]="!newVacation.startDate || !newVacation.endDate">
+        </button>
+      </ng-template>
+    </p-dialog>
   `
 })
 export class EmployeeViewComponent implements OnInit {
   employee: Employee | null = null;
   loading = false;
   error: string | null = null;
+
+  // Dialog states
+  absenceDialogVisible = false;
+  vacationDialogVisible = false;
+
+  // New absence and vacation objects
+  newAbsence: Partial<Absence> = {
+    date: '',
+    description: ''
+  };
+
+  newVacation: Partial<Vacation> = {
+    startDate: '',
+    endDate: ''
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -193,5 +327,77 @@ export class EmployeeViewComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/employees']);
+  }
+
+  showAbsenceDialog(): void {
+    this.newAbsence = {
+      date: '',
+      description: ''
+    };
+    this.absenceDialogVisible = true;
+  }
+
+  showVacationDialog(): void {
+    this.newVacation = {
+      startDate: '',
+      endDate: ''
+    };
+    this.vacationDialogVisible = true;
+  }
+
+  saveAbsence(): void {
+    if (!this.employee || !this.newAbsence.date) {
+      return;
+    }
+
+    const absenceToSave = {
+      date: this.formatDateForBackend(this.newAbsence.date),
+      description: this.newAbsence.description || ''
+    };
+
+    this.employeeService.addAbsenceToEmployee(this.employee.id, absenceToSave, {
+      next: (updatedEmployee) => {
+        this.employee = updatedEmployee;
+        this.absenceDialogVisible = false;
+        this.newAbsence = { date: '', description: '' };
+      },
+      error: (error) => {
+        this.error = 'Erreur lors de l\'ajout de l\'absence';
+        console.error('Error adding absence:', error);
+      }
+    });
+  }
+
+  saveVacation(): void {
+    if (!this.employee || !this.newVacation.startDate || !this.newVacation.endDate) {
+      return;
+    }
+
+    const vacationToSave = {
+      startDate: this.formatDateForBackend(this.newVacation.startDate),
+      endDate: this.formatDateForBackend(this.newVacation.endDate)
+    };
+
+    this.employeeService.addVacationToEmployee(this.employee.id, vacationToSave, {
+      next: (updatedEmployee) => {
+        this.employee = updatedEmployee;
+        this.vacationDialogVisible = false;
+        this.newVacation = { startDate: '', endDate: '' };
+      },
+      error: (error) => {
+        this.error = 'Erreur lors de l\'ajout du congé';
+        console.error('Error adding vacation:', error);
+      }
+    });
+  }
+
+  private formatDateForBackend(date: any): string {
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0];
+    }
+    if (typeof date === 'string') {
+      return date;
+    }
+    return '';
   }
 }
