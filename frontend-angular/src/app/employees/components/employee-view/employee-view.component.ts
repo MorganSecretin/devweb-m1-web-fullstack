@@ -27,7 +27,7 @@ import { EmployeeService } from '@app/employees/services/employee.service';
           </div>
         </div>
 
-        <div *ngIf="employee" class="space-y-6">
+        <div *ngIf="employee && employee.person" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Informations personnelles -->
             <div class="bg-gray-50 p-4 rounded-lg">
@@ -39,15 +39,15 @@ import { EmployeeService } from '@app/employees/services/employee.service';
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Nom:</label>
-                  <p class="text-gray-900">{{ employee.person.name }}</p>
+                  <p class="text-gray-900">{{ employee.person.name || '-' }}</p>
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Date de naissance:</label>
-                  <p class="text-gray-900">{{ employee.person.birth | date:'dd/MM/yyyy' }}</p>
+                  <p class="text-gray-900">{{ employee.person.birth ? (employee.person.birth | date:'dd/MM/yyyy') : '-' }}</p>
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Adresse:</label>
-                  <p class="text-gray-900">{{ employee.person.address }}</p>
+                  <p class="text-gray-900">{{ employee.person.address || '-' }}</p>
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Email:</label>
@@ -55,7 +55,7 @@ import { EmployeeService } from '@app/employees/services/employee.service';
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Téléphone:</label>
-                  <p class="text-gray-900">{{ employee.person.phone }}</p>
+                  <p class="text-gray-900">{{ employee.person.phone || '-' }}</p>
                 </div>
               </div>
             </div>
@@ -66,15 +66,15 @@ import { EmployeeService } from '@app/employees/services/employee.service';
               <div class="space-y-3">
                 <div>
                   <label class="text-sm font-medium text-gray-600">Poste:</label>
-                  <p class="text-gray-900">{{ employee.job }}</p>
+                  <p class="text-gray-900">{{ employee.job || '-' }}</p>
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Salaire:</label>
-                  <p class="text-gray-900">{{ employee.salary | currency:'EUR':'symbol':'1.2-2' }}</p>
+                  <p class="text-gray-900">{{ employee.salary !== null && employee.salary !== undefined ? (employee.salary | currency:'EUR':'symbol':'1.2-2') : '-' }}</p>
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Début de contrat:</label>
-                  <p class="text-gray-900">{{ employee.contractStart | date:'dd/MM/yyyy' }}</p>
+                  <p class="text-gray-900">{{ employee.contractStart ? (employee.contractStart | date:'dd/MM/yyyy') : '-' }}</p>
                 </div>
                 <div>
                   <label class="text-sm font-medium text-gray-600">Fin de contrat:</label>
@@ -186,7 +186,7 @@ export class EmployeeViewComponent implements OnInit {
   }
 
   editEmployee(): void {
-    if (this.employee) {
+    if (this.employee && this.employee.person && this.employee.person.id) {
       this.router.navigate(['/employees/edit', this.employee.person.id]);
     }
   }

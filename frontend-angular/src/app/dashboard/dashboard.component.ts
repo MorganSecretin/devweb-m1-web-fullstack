@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { ApplicantService } from '@app/applicants/services/applicants.service';
 import { EmployeeService } from '@app/employees/services/employee.service';
 
@@ -8,11 +9,17 @@ import { EmployeeService } from '@app/employees/services/employee.service';
     template: `
     <h1>welcome</h1>
     <div style="display: flex; justify-content: center; align-items: center; height: 60vh; gap: 2rem;">
-        <div style="background: #f5f5f5; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 2rem 3rem; min-width: 200px; text-align: center;">
+        <div
+            style="background: #f5f5f5; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 2rem 3rem; min-width: 200px; text-align: center; cursor: pointer;"
+            (click)="navigateTo('/employees')"
+            >
             <h2>Employés</h2>
             <p style="font-size: 2.5rem; margin: 0;">{{ nbEmployees }}</p>
         </div>
-        <div style="background: #f5f5f5; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 2rem 3rem; min-width: 200px; text-align: center;">
+        <div
+            style="background: #f5f5f5; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 2rem 3rem; min-width: 200px; text-align: center; cursor: pointer;"
+            (click)="navigateTo('/applicants')"
+            >
             <h2>Candidats</h2>
             <p style="font-size: 2.5rem; margin: 0;">{{ nbApplicants }}</p>
         </div>
@@ -26,6 +33,7 @@ export class DashboardComponent {
     constructor(
         private readonly employeeService: EmployeeService,
         private readonly applicantService: ApplicantService,
+        private readonly router: Router,
     ) {}
 
     ngOnInit() {
@@ -46,5 +54,9 @@ export class DashboardComponent {
                 console.error('Erreur lors du comptage des candidats:', error);
             }
         });
+    }
+
+    navigateTo(path: string): void {
+        this.router.navigate([path]);
     }
 }

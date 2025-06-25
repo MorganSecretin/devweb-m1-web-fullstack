@@ -10,17 +10,27 @@ INSERT INTO persons (id, name, birth, address, email, phone) VALUES
     ('AB12', 'Alice Dupont', '1995-05-20', '123 rue A', 'alice@example.com', '0612345678'),
     ('CD34', 'Charles Durand', '1988-09-15', '456 rue B', 'charles@example.com', '0698765432'),
     ('EF56', 'Emma Fontaine', '1990-03-10', '789 rue C', 'emma@example.com', '0677889900'),
-    ('GH78', 'Gabriel Martin', '1985-11-30', '321 rue D', 'gabriel@example.com', '0655443322');
+    ('GH78', 'Gabriel Martin', '1985-11-30', '321 rue D', 'gabriel@example.com', '0655443322'),
+    ('IJ90', 'Isabelle Jolie', '1992-07-12', '555 rue E', 'isabelle@example.com', '0611223344'),
+    ('KL12', 'Kevin Lefranc', '1989-04-25', '666 rue F', 'kevin@example.com', '0622334455'),
+    ('MN34', 'Marie Noël', '1991-12-03', '777 rue G', 'marie@example.com', '0633445566'),
+    ('OP56', NULL, NULL, NULL, 'candidat@example.com', NULL), -- Candidat avec minimum de données
+    ('QR78', NULL, NULL, NULL, 'employe@example.com', NULL); -- Employé avec minimum de données
 
 -- Données pour les employés
 INSERT INTO employees (id, job, salary, contract_start, contract_end, comment) VALUES
     ('CD34', 'Développeur', 42000, '2024-01-01', '2026-01-01', 'Employé confirmé'),
     ('EF56', 'Chargée RH', 39000, '2024-03-01', '2025-12-31', 'Polyvalente'),
-    ('GH78', 'Chef de projet', 53000, '2023-05-01', '2025-05-01', 'Leadership apprécié');
+    ('GH78', 'Chef de projet', 53000, '2023-05-01', '2025-05-01', 'Leadership apprécié'),
+    ('QR78', NULL, NULL, NULL, NULL, NULL); -- Employé avec minimum de données
 
 -- Données pour les candidats
 INSERT INTO applicants (id, note, domain, interview_date, comment) VALUES
-    ('AB12', 8, 'Informatique', '2025-07-01', 'Bon profil');
+    ('AB12', 8, 'Informatique', '2025-07-01', 'Bon profil'),
+    ('IJ90', 7, 'Marketing', '2025-07-10', 'Bonne communication'),
+    ('KL12', 9, 'Finance', '2025-07-15', 'Excellente expérience'),
+    ('MN34', 6, 'Ressources Humaines', '2025-07-20', 'À former'),
+    ('OP56', NULL, NULL, NULL, NULL); -- Candidat avec minimum de données
 
 -- Données pour Vacation (avec références vers les employés)
 INSERT INTO vacations (start_date, end_date, employee_id) VALUES

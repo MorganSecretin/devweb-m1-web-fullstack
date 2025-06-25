@@ -32,7 +32,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     // Ici, vous pouvez gérer les erreurs spécifiques liées à l'authentification
                     if (error.status === 401) {
                         // Par exemple, rediriger vers la page de connexion ou afficher un message d'erreur
-                        console.warn('AuthInterceptor: Unauthorized request, redirecting to login');
+                        this.authService.removeToken();
                         this.router.navigate(['/login']);
                     }
                 }

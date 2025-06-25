@@ -27,7 +27,7 @@ import { ApplicantService } from '@app/applicants/services/applicants.service';
           </div>
         </div>
 
-        <div *ngIf="applicant" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngIf="applicant && applicant.person" class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Informations personnelles -->
           <div class="bg-gray-50 p-4 rounded-lg">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Informations Personnelles</h2>
@@ -38,15 +38,15 @@ import { ApplicantService } from '@app/applicants/services/applicants.service';
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Nom:</label>
-                <p class="text-gray-900">{{ applicant.person.name }}</p>
+                <p class="text-gray-900">{{ applicant.person.name || '-' }}</p>
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Date de naissance:</label>
-                <p class="text-gray-900">{{ applicant.person.birth | date:'dd/MM/yyyy' }}</p>
+                <p class="text-gray-900">{{ applicant.person.birth ? (applicant.person.birth | date:'dd/MM/yyyy') : '-' }}</p>
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Adresse:</label>
-                <p class="text-gray-900">{{ applicant.person.address }}</p>
+                <p class="text-gray-900">{{ applicant.person.address || '-' }}</p>
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Email:</label>
@@ -54,7 +54,7 @@ import { ApplicantService } from '@app/applicants/services/applicants.service';
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Téléphone:</label>
-                <p class="text-gray-900">{{ applicant.person.phone }}</p>
+                <p class="text-gray-900">{{ applicant.person.phone || '-' }}</p>
               </div>
             </div>
           </div>
@@ -63,17 +63,17 @@ import { ApplicantService } from '@app/applicants/services/applicants.service';
           <div class="bg-gray-50 p-4 rounded-lg">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Informations Candidature</h2>
             <div class="space-y-3">
-              <div *ngIf="applicant.note !== undefined">
+              <div>
                 <label class="text-sm font-medium text-gray-600">Note:</label>
-                <p class="text-gray-900">{{ applicant.note }}/20</p>
+                <p class="text-gray-900">{{ applicant.note !== undefined && applicant.note !== null ? applicant.note + '/20' : '-' }}</p>
               </div>
-              <div *ngIf="applicant.domain">
+              <div>
                 <label class="text-sm font-medium text-gray-600">Domaine:</label>
-                <p class="text-gray-900">{{ applicant.domain }}</p>
+                <p class="text-gray-900">{{ applicant.domain || '-' }}</p>
               </div>
-              <div *ngIf="applicant.interviewDate">
+              <div>
                 <label class="text-sm font-medium text-gray-600">Date d'entretien:</label>
-                <p class="text-gray-900">{{ applicant.interviewDate | date:'dd/MM/yyyy' }}</p>
+                <p class="text-gray-900">{{ applicant.interviewDate ? (applicant.interviewDate | date:'dd/MM/yyyy') : '-' }}</p>
               </div>
               <div *ngIf="applicant.comment">
                 <label class="text-sm font-medium text-gray-600">Commentaire:</label>
@@ -134,7 +134,7 @@ export class ApplicantViewComponent implements OnInit {
   }
 
   editApplicant(): void {
-    if (this.applicant) {
+    if (this.applicant && this.applicant.person && this.applicant.person.id) {
       this.router.navigate(['/applicants/edit', this.applicant.person.id]);
     }
   }

@@ -243,19 +243,21 @@ export class EmployeeEditComponent implements OnInit {
 
     this.employeeService.getById(id, {
       next: (employee) => {
-        this.employeeForm.patchValue({
-          id: employee.person.id,
-          name: employee.person.name,
-          birth: employee.person.birth,
-          address: employee.person.address,
-          email: employee.person.email,
-          phone: employee.person.phone,
-          job: employee.job,
-          salary: employee.salary,
-          contractStart: employee.contractStart,
-          contractEnd: employee.contractEnd,
-          comment: employee.comment
-        });
+        if (employee && employee.person) {
+          this.employeeForm.patchValue({
+            id: employee.person.id, // ID obligatoire
+            name: employee.person.name || '',
+            birth: employee.person.birth || '',
+            address: employee.person.address || '',
+            email: employee.person.email, // Email obligatoire
+            phone: employee.person.phone || '',
+            job: employee.job || '',
+            salary: employee.salary ?? '',
+            contractStart: employee.contractStart || '',
+            contractEnd: employee.contractEnd || '',
+            comment: employee.comment || ''
+          });
+        }
         this.loading = false;
       },
       error: (error) => {
@@ -273,20 +275,20 @@ export class EmployeeEditComponent implements OnInit {
 
       const formData = this.employeeForm.value;
       const employee: Employee = {
-        id: formData.id,
+        id: formData.id, // ID obligatoire
         person: {
-          id: formData.id,
-          name: formData.name,
-          birth: formData.birth,
-          address: formData.address,
-          email: formData.email,
-          phone: formData.phone
+          id: formData.id, // ID obligatoire
+          name: formData.name && formData.name !== '-' ? formData.name : undefined,
+          birth: formData.birth && formData.birth !== '-' ? formData.birth : undefined,
+          address: formData.address && formData.address !== '-' ? formData.address : undefined,
+          email: formData.email, // Email obligatoire
+          phone: formData.phone && formData.phone !== '-' ? formData.phone : undefined
         },
-        job: formData.job,
-        salary: formData.salary,
-        contractStart: formData.contractStart,
-        contractEnd: formData.contractEnd || null,
-        comment: formData.comment || '',
+        job: formData.job && formData.job !== '-' ? formData.job : undefined,
+        salary: formData.salary && formData.salary !== '-' && formData.salary !== '' ? Number(formData.salary) : undefined,
+        contractStart: formData.contractStart && formData.contractStart !== '-' ? formData.contractStart : undefined,
+        contractEnd: formData.contractEnd && formData.contractEnd !== '-' ? formData.contractEnd : null,
+        comment: formData.comment || undefined, // Les commentaires vides deviennent undefined
         vacations: [],
         absences: []
       };

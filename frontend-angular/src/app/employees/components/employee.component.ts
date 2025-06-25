@@ -26,10 +26,10 @@ import { TableModule } from 'primeng/table';
             </ng-template>
             <ng-template pTemplate="body" let-employee>
                 <tr>
-                    <td>{{ employee.person.name }}</td>
-                    <td>{{ employee.job }}</td>
-                    <td>{{ employee.person.email }}</td>
-                    <td>{{ employee.person.phone }}</td>
+                    <td>{{ employee.person?.name || '' }}</td>
+                    <td>{{ employee.job || '' }}</td>
+                    <td>{{ employee.person?.email || '' }}</td>
+                    <td>{{ employee.person?.phone || '' }}</td>
                     <td class="flex gap-2">
                         <p-button severity="success" (click)="view(employee)">Voir</p-button>
                         <p-button severity="info" (click)="update(employee)">Mettre à jour</p-button>
@@ -54,6 +54,9 @@ export class EmployeeComponent {
     }
 
     load() {
+        // Vider le tableau avant de charger
+        this.employees.length = 0;
+        
         this.employeeService.getAll({
             next: (data) => {
                 this.employees.push(...data);
@@ -70,26 +73,33 @@ export class EmployeeComponent {
 
     view(employee: Employee) {
         // Navigation vers la page de détails de l'employé
-        this.router.navigate(['/employees/view', employee.person.id]);
+        if (employee && employee.person && employee.person.id) {
+            this.router.navigate(['/employees/view', employee.person.id]);
+        }
     }
 
     update(employee: Employee) {
         // Navigation vers la page de modification de l'employé
-        this.router.navigate(['/employees/edit', employee.person.id]);
+        if (employee && employee.person && employee.person.id) {
+            this.router.navigate(['/employees/edit', employee.person.id]);
+        }
     }
 
     delete(employee: Employee) {
         // Confirmer avant suppression
-        if (confirm(`Êtes-vous sûr de vouloir supprimer l'employé ${employee.person.name} ?`)) {
-            this.employeeService.delete(employee.person.id, {
-                next: () => {
-                    // Vider le tableau et recharger
-                    this.load();
-                },
-                error: (error) => {
-                    console.error('Erreur lors de la suppression de l\'employé:', error);
-                }
-            });
+        if (employee && employee.person && employee.person.id) {
+            const name = employee.person.name || 'cet employé';
+            if (confirm(`Êtes-vous sûr de vouloir supprimer ${name} ?`)) {
+                this.employeeService.delete(employee.person.id, {
+                    next: () => {
+                        // Recharger la liste
+                        this.load();
+                    },
+                    error: (error) => {
+                        console.error('Erreur lors de la suppression de l\'employé:', error);
+                    }
+                });
+            }
         }
     }
 }

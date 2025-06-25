@@ -1,5 +1,6 @@
 package fr.ynov.devweb.entities;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,20 +21,25 @@ public class Applicant {
     private String id; // Same as Person ID
     
     @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "id", referencedColumnName = "id", nullable = false)
+    @MapsId
     private Person person;
 
     @Min(0)
     @Max(10)
+    @Nullable()
     @Column()
     private Integer note;
 
+    @Nullable()
     @Column()
     private String domain;
 
+    @Nullable()
     @Column()
     private LocalDate interviewDate;
 
+    @Nullable()
     @Column()
     private String comment;
 }

@@ -225,18 +225,20 @@ export class ApplicantEditComponent implements OnInit {
 
     this.applicantService.getById(id, {
       next: (applicant) => {
-        this.applicantForm.patchValue({
-          id: applicant.person.id,
-          name: applicant.person.name,
-          birth: applicant.person.birth,
-          address: applicant.person.address,
-          email: applicant.person.email,
-          phone: applicant.person.phone,
-          note: applicant.note,
-          domain: applicant.domain,
-          interviewDate: applicant.interviewDate,
-          comment: applicant.comment
-        });
+        if (applicant && applicant.person) {
+          this.applicantForm.patchValue({
+            id: applicant.person.id, // ID obligatoire, ne peut pas être null
+            name: applicant.person.name || '',
+            birth: applicant.person.birth || '',
+            address: applicant.person.address || '',
+            email: applicant.person.email, // Email obligatoire, ne peut pas être null
+            phone: applicant.person.phone || '',
+            note: applicant.note ?? '',
+            domain: applicant.domain || '',
+            interviewDate: applicant.interviewDate || '',
+            comment: applicant.comment || '' // Pas de '-' pour les commentaires
+          });
+        }
         this.loading = false;
       },
       error: (error) => {
@@ -254,19 +256,19 @@ export class ApplicantEditComponent implements OnInit {
 
       const formData = this.applicantForm.value;
       const applicant: Applicant = {
-        id: formData.id,
+        id: formData.id, // ID obligatoire
         person: {
-          id: formData.id,
-          name: formData.name,
-          birth: formData.birth,
-          address: formData.address,
-          email: formData.email,
-          phone: formData.phone
+          id: formData.id, // ID obligatoire
+          name: formData.name && formData.name !== '-' ? formData.name : undefined,
+          birth: formData.birth && formData.birth !== '-' ? formData.birth : undefined,
+          address: formData.address && formData.address !== '-' ? formData.address : undefined,
+          email: formData.email, // Email obligatoire
+          phone: formData.phone && formData.phone !== '-' ? formData.phone : undefined
         },
-        note: formData.note || undefined,
-        domain: formData.domain || undefined,
-        interviewDate: formData.interviewDate || undefined,
-        comment: formData.comment || undefined
+        note: formData.note && formData.note !== '-' && formData.note !== '' ? Number(formData.note) : undefined,
+        domain: formData.domain && formData.domain !== '-' ? formData.domain : undefined,
+        interviewDate: formData.interviewDate && formData.interviewDate !== '-' ? formData.interviewDate : undefined,
+        comment: formData.comment || undefined // Les commentaires vides deviennent undefined
       };
 
       const resultHandler = {

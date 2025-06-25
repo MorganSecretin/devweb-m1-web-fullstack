@@ -26,7 +26,7 @@ public class Person {
     @Column()
     private String address;
 
-    @Column()
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(length = 10)
