@@ -37,9 +37,7 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
         List<EmployeeDto> employees = employeeService.getAllEmployees();
-        if (employees.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+        // Toujours retourner 200 OK avec la liste (même si elle est vide)
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 

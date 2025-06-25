@@ -20,7 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 
@@ -56,6 +58,28 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            // Vérifier si la réponse a déjà été traitée
+            if (response.isCommitted()) {
+                return;
+            }
+            
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            
+            String jsonResponse = String.format(
+                "{\"error\": \"Forbidden\", \"message\": \"%s\", \"path\": \"%s\", \"timestamp\": \"%s\"}",
+                "Accès refusé. Permissions insuffisantes.",
+                request.getRequestURI(),
+                java.time.Instant.now().toString()
+            );
+            
+            response.getWriter().write(jsonResponse);
+        };
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -72,7 +96,9 @@ public class SecurityConfig {
                         // .requestMatchers("/api/products/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .exceptionHandling(exception -> exception
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                    .accessDeniedHandler(accessDeniedHandler()))
                 .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

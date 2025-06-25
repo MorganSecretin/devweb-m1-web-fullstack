@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -24,10 +23,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-
     private final UserService userService;
 
     public JwtRequestFilter(UserService userService) {
@@ -41,27 +36,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        try {
-            String token = getJWTFromRequest(request);
+        String token = getJWTFromRequest(request);
 
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            try {
                 String username = jwtTokenProvider.getUsernameFromToken(token);
-
                 UserDetails userDetails = userService.loadUserByUsername(username);
-
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
+                
+                UsernamePasswordAuthenticationToken authentication = 
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
+            } catch (Exception e) {
+                // En cas d'erreur lors de la récupération des détails utilisateur
+                System.err.println("Erreur lors de l'authentification: " + e.getMessage());
+                SecurityContextHolder.clearContext();
             }
-
-            filterChain.doFilter(request, response);
-        }catch (AuthenticationException e){
-            jwtAuthenticationEntryPoint.commence(request, response, e);
         }
-
-
+        
+        filterChain.doFilter(request, response);
     }
 
     private String getJWTFromRequest(HttpServletRequest request) {

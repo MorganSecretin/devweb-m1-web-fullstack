@@ -48,10 +48,14 @@ export class ApplicantService {
         });
     }
 
-    // Obtenir tous les employés
+    // Obtenir tous les candidats
     getAll(resultHandler?: ResultHandler<Applicant[]>): void {
         this.http.get<Applicant[]>(this.apiUrl).subscribe({
-            next: (data) => resultHandler?.next?.(data),
+            next: (data) => {
+                // S'assurer que data est un tableau, sinon retourner un tableau vide
+                const applicants = Array.isArray(data) ? data : [];
+                resultHandler?.next?.(applicants);
+            },
             error: (error) => resultHandler?.error?.(error),
         });
     }

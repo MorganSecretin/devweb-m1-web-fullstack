@@ -36,9 +36,7 @@ public class ApplicantController {
     @GetMapping
     public ResponseEntity<List<ApplicantDto>> getAllApplicants() {
         List<ApplicantDto> applicants = applicantService.getAllApplicants();
-        if (applicants.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+        // Toujours retourner 200 OK avec la liste (même si elle est vide)
         return new ResponseEntity<>(applicants, HttpStatus.OK);
     }
 

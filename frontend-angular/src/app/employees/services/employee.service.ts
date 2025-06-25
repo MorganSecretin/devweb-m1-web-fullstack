@@ -55,7 +55,11 @@ export class EmployeeService {
     // Obtenir tous les employés
     getAll(resultHandler?: ResultHandler<Employee[]>): void {
         this.http.get<Employee[]>(this.apiUrl).subscribe({
-            next: (data) => resultHandler?.next?.(data),
+            next: (data) => {
+                // S'assurer que data est un tableau, sinon retourner un tableau vide
+                const employees = Array.isArray(data) ? data : [];
+                resultHandler?.next?.(employees);
+            },
             error: (error) => resultHandler?.error?.(error),
         });
     }
